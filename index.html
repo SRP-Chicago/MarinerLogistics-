@@ -677,7 +677,7 @@ function officeLayer(svg, map, withLabels) {
   });
 })();
 
-/* ---- thank-you contacts, with a save-contact (vCard) link ---- */
+/* ---- thank-you contacts, with a copy-contact button ---- */
 (function contacts() {
   const box = document.getElementById("contacts");
   TEAM.forEach(p => {
@@ -686,16 +686,16 @@ function officeLayer(svg, map, withLabels) {
     d.innerHTML = `<h3>${esc(p.name)}</h3><p>${esc(p.role)}</p>
       <a class="clink" href="${telHref(p.phone)}">Cell: ${esc(p.phone)}</a>
       <a class="clink" href="mailto:${esc(p.email)}">${esc(p.email)}</a>
-      <button class="clink vcf" type="button">Save contact</button>`;
-    d.querySelector(".vcf").addEventListener("click", () => {
-      const [first, ...rest] = p.name.split(" ");
-      const vcf = ["BEGIN:VCARD", "VERSION:3.0", `N:${rest.join(" ")};${first};;;`, `FN:${p.name}`, "ORG:Stream Realty Partners",
-        `TITLE:${p.role}`, `TEL;TYPE=CELL:+1${p.phone.replace(/\D/g, "")}`, `EMAIL;TYPE=WORK:${p.email}`, "END:VCARD"].join("\r\n");
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([vcf], { type: "text/vcard" }));
-      a.download = p.name.replace(/\s+/g, "-").toLowerCase() + ".vcf";
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      <button class="clink vcf" type="button">Copy contact</button>`;
+    d.querySelector(".vcf").addEventListener("click", async e => {
+      const b = e.currentTarget, text = `${p.name}\n${p.role}, Stream Realty Partners\nCell: ${p.phone}\n${p.email}`;
+      try { await navigator.clipboard.writeText(text); b.textContent = "Copied"; }
+      catch (err) {
+        // clipboard refused: select the visible details so they can be copied by hand
+        const r = document.createRange(); r.selectNodeContents(d); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        b.textContent = "Selected · press Ctrl/⌘ C";
+      }
+      setTimeout(() => { b.textContent = "Copy contact"; }, 2200);
     });
     box.appendChild(d);
   });
