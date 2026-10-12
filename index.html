@@ -552,7 +552,7 @@ function officeLayer(svg, map, withLabels) {
       const cx = pts.reduce((a, o) => a + o.x, 0) / pts.length, cy = pts.reduce((a, o) => a + o.y, 0) / pts.length;
       svgEl("line", { x1: cx, y1: cy, x2: anchor === "start" ? x - 4 : x, y2: y + (y > cy ? -12 : 4), class: "lead" }, g);
       const t = svgEl("text", { x, y, "text-anchor": anchor, class: "rlbl", tabindex: 0 }, g);
-      t.textContent = pts.length > 1 ? `${region} · ${pts.length}` : region;
+      t.textContent = region;
       const on = () => {
         t.classList.add("on");
         dots.forEach(d => d.classList.toggle("on", d.dataset.region === region));
