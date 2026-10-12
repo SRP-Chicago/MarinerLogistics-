@@ -115,10 +115,7 @@ a { color: inherit; }
 .client:hover .logo { filter: none; }
 .client .wm { font-size: 23px; line-height: 1; }
 /* typographic wordmarks for clients without a logo file yet */
-.wm-shipbob { font-family: var(--body); font-weight: 700; letter-spacing: -.01em; }
 .wm-scot { font-family: var(--display); font-weight: 800; font-style: italic; letter-spacing: .04em; text-transform: uppercase; }
-.wm-hirsch { font-family: var(--body); font-weight: 600; font-style: italic; }
-.wm-loadsmart { font-family: var(--body); font-weight: 600; letter-spacing: -.02em; text-transform: lowercase; }
 .wm-flock { font-family: var(--tech); font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
 .wm-flock small { display: block; font-family: var(--body); font-size: 13px; letter-spacing: .04em; text-transform: none; margin-top: 3px; opacity: .7; }
 
@@ -334,15 +331,15 @@ a { color: inherit; }
       <aside class="clients-panel">
         <span class="overline rise" style="--d:2">Representative clients</span>
         <h3 class="rise" style="--d:3">Logistics</h3>
-        <!-- Logos are transparent PNGs in assets/clients/, shown white and in full color on hover. To add one: replace a <span class="wm …"> with <img class="logo" src="assets/clients/name.png" alt="…"> -->
+        <!-- Logos are transparent PNG/SVG files in assets/clients/, shown white and in full color on hover. To add one: replace a <span class="wm …"> with <img class="logo" src="assets/clients/name.png" alt="…"> -->
         <ul class="client-grid rise" style="--d:4">
           <li class="client"><img class="logo" src="assets/clients/ch-robinson.png" alt="C.H. Robinson" style="max-width:90%"></li>
-          <li class="client"><span class="wm wm-shipbob">ShipBob</span></li>
+          <li class="client"><img class="logo" src="assets/clients/shipbob.svg" alt="ShipBob" style="max-height:34px"></li>
           <li class="client"><img class="logo" src="assets/clients/crst.png" alt="CRST"></li>
           <li class="client"><span class="wm wm-scot">Scotlynn</span></li>
-          <li class="client"><span class="wm wm-hirsch">Hirschbach</span></li>
+          <li class="client"><img class="logo" src="assets/clients/hirschbach.svg" alt="Hirschbach" style="max-height:48px"></li>
           <li class="client"><img class="logo" src="assets/clients/fwf.png" alt="FWF" style="max-height:46px"></li>
-          <li class="client"><span class="wm wm-loadsmart">loadsmart</span></li>
+          <li class="client"><img class="logo" src="assets/clients/loadsmart.svg" alt="loadsmart" style="max-height:28px"></li>
           <li class="client"><span class="wm wm-flock">Flock<small>Freight</small></span></li>
           <li class="client"><img class="logo" src="assets/clients/schneider.png" alt="Schneider"></li>
           <li class="client"><img class="logo" src="assets/clients/best-bay.png" alt="Best Bay Logistics" style="max-height:44px"></li>
