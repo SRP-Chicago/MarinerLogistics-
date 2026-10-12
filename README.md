@@ -4,17 +4,23 @@ Interactive pitch deck from the Stream Realty Partners Chicago Tenant Rep team f
 
 ## Presenting
 
-- **Navigate:** arrow keys, Page Up/Down, the space bar, swipe, or click a stop on the route bar. `Home` and `End` jump to the first and last slide.
-- **Full screen:** the button at the bottom right.
-- **Deep links:** `#cover`, `#team`, `#stream`, `#locations`, `#close`.
-- **Interactive bits:** stats count up when a slide opens, the cover's lime halftone drifts with the pointer, team photos spotlight on click, and the Stream map has toggles for Stream offices and Mariner's current sites (hover a dot for its city).
+- **Navigate:** arrow keys, Page Up/Down, the space bar, swipe, or click a stop on the route bar. `Home` and `End` jump to the first and last slide; `F` toggles full screen.
+- **Deep links:** `#cover`, `#team`, `#partner`, `#footprint`, `#close`.
+- **Interactive bits:**
+  - The cover globe drifts with the pointer.
+  - On the team slide, click a photo to open that person's phone and email.
+  - The Stream office map shows city names on hover, and region labels light up their offices.
+  - Stats count up when their slide opens.
+  - The footprint map can overlay Stream's offices on Mariner's sites.
+  - The thank-you slide has call, email and save-contact (vCard) links.
 - Below 820px wide, the deck becomes one scrolling page for phones.
 
 ## Editing
 
-- **Locations:** fill in the `LOCATIONS` array at the top of the script. Any value left `null` shows "To come". The draft tag hides once any site has data.
-- **Look and feel:** follows marinerlogistics.com: black ground, Mariner lime (`#D3FF28`, sampled from their site), white type, square corners, and their dot-matrix grid. All colors are the `:root` tokens at the top of the style block. The cover's halftone field of squares is drawn on a canvas and follows the pointer.
-- **Mariner logo:** `assets/mariner-logo.png` was cut from a screenshot of their site, and `assets/mariner-icon.svg` is a vector redraw of their M mark. Swap in official files from Mariner when you have them.
-- **Client logos:** the logistics clients are typographic wordmarks for now. To use real logos, add files under `assets/clients/` and swap each `<span class="wm …">` for an `<img>` (see the comment in the markup).
-- **Team:** Adrian Boone, Jordan Decker, Phil Geiger. Headshots are in `assets/` (600×750 JPG).
-- **Map:** `assets/us-map.js` holds the state outlines (us-atlas, Albers USA) and the projected city points.
+- **Team:** the `TEAM` array at the top of the script holds names, titles, phones, emails and headshots. It feeds both the team slide and the thank-you slide.
+- **Footprint:** the `FOOTPRINT` array (just below `TEAM`) holds Mariner's locations, which the team will provide. Add one object per site with `lat`/`lon`, and the pin, list row, totals and type filters build themselves. The "Draft" tag hides once there's a site. There's an example in the comment.
+- **Look and feel:** follows marinerlogistics.com: black and navy (`#0D1A2E`) grounds, Mariner lime (`#D3FF28`), off-white type, square corners, and lime hairlines at 20%. The colors are taken from their site stylesheet, and all of them are `:root` tokens at the top of the style block.
+- **Type:** Mariner's site uses licensed Adobe/commercial faces (Axia, Video, Trasandina). The deck uses Exo, which their site also loads, plus Chakra Petch in place of Video for labels and buttons.
+- **Logos:** `assets/mariner-logo.svg` and `assets/mariner-icon.svg` are the SVGs served on marinerlogistics.com. The logistics clients are typographic wordmarks for now. To use real logos, add files under `assets/clients/` and swap each `<span class="wm …">` for an `<img>` (see the comment in the markup).
+- **Photos:** `assets/photos/`, supplied for the deck.
+- **Map:** `assets/us-map.js` holds the state outlines (us-atlas, Albers USA), the states Stream operates in, and Stream's 21 office points. The deck projects footprint lat/lon with the same projection.

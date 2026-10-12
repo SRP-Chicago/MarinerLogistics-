@@ -4,27 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mariner Logistics Deck</title>
+<link rel="icon" href="assets/mariner-icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600;700&family=Saira:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo:wght@300;400;500;600;700&family=Chakra+Petch:wght@400;500;600&display=swap">
 <style>
-/* Layout: a fixed 1600x900 slide scaled to fit, with a freight-route progress bar below.
+/* Layout: a fixed 1600x900 slide scaled to fit, with a route-bar progress nav below.
    Below 820px wide the slides stack into one scrolling page.
-   Look follows marinerlogistics.com: black ground, electric lime accent, white type, square corners.
-   Single deliberate dark look (no light-mode swap). */
+   Look follows marinerlogistics.com: black and navy grounds, Mariner lime, off-white type,
+   square corners, lime hairlines at 20%. Single deliberate dark look (no light-mode swap). */
 :root {
-  --black: #000000;    /* Mariner ground */
-  --panel: #111314;    /* raised surfaces */
-  --panel-2: #1A1D1F;  /* map land, hover */
-  --lime: #D3FF28;     /* Mariner lime, sampled from their site */
-  --white: #FFFFFF;
-  --text: #E9ECEE;
-  --grey: #8E959B;     /* labels */
-  --rule: #2B2F32;     /* hairlines */
+  --black: #000000;
+  --navy: #0D1A2E;       /* Mariner section navy */
+  --navy-2: #15243B;     /* raised on navy */
+  --navy-3: #1B2C46;     /* map land */
+  --deep: #000A28;
+  --lime: #D3FF28;       /* Mariner lime */
+  --lime-line: rgba(211, 255, 40, .2);
+  --white: #FAFBFF;
+  --text: #E4EBF3;
+  --grey: #A2A6B8;
+  --rule: rgba(250, 251, 255, .14);
 
-  --display: "Saira Semi Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  --body: Saira, "Helvetica Neue", Arial, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --display: Exo, "Helvetica Neue", Arial, sans-serif;
+  --body: Exo, "Helvetica Neue", Arial, sans-serif;
+  --tech: "Chakra Petch", Exo, ui-monospace, monospace;   /* stands in for Mariner's "Video" face */
 
   --nav-h: 64px;
   color-scheme: dark;
@@ -33,173 +37,204 @@ html, body { height: 100%; }
 body { margin: 0; background: var(--black); color: var(--text); font-family: var(--body); -webkit-font-smoothing: antialiased; overflow: hidden; }
 * { box-sizing: border-box; }
 img { max-width: 100%; display: block; }
-h1, h2, h3, p, ul { margin: 0; }
+h1, h2, h3, p, ul, ol, dl, dd { margin: 0; }
 h1, h2, h3 { text-wrap: balance; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
 .lime { color: var(--lime); }
+[hidden] { display: none !important; }
 
 /* ---------- stage ---------- */
 .viewport { position: fixed; inset: 0 0 calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)) 0; overflow: hidden; }
 .stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform: translate(-50%, -50%) scale(var(--s, .5)); transform-origin: center; }
-.slide { position: absolute; inset: 0; overflow: hidden; background: var(--black); color: var(--text); opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; outline: 1px solid var(--rule); }
-.slide.is-active { opacity: 1; visibility: visible; transition: opacity .45s ease, visibility 0s; }
+.slide { position: absolute; inset: 0; overflow: hidden; background: var(--black); color: var(--text); opacity: 0; visibility: hidden; transition: opacity .5s ease, visibility 0s linear .5s; outline: 1px solid var(--lime-line); }
+.slide.is-active { opacity: 1; visibility: visible; transition: opacity .5s ease, visibility 0s; }
+.slide.navy { background: var(--navy); }
 
-/* shared slide chrome: Mariner left, Stream right */
-.slide-head { position: absolute; left: 80px; right: 80px; top: 48px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
-.mariner-mark { height: 30px; width: auto; }
-.stream-mark { height: 30px; width: auto; filter: brightness(0) invert(1); }
-.eyebrow { font-family: var(--mono); font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--lime); }
-.title { font-family: var(--display); font-weight: 600; font-size: 80px; line-height: .98; letter-spacing: -.01em; color: var(--white); }
-.title .dot { color: var(--lime); }
-.label { font-family: var(--mono); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--grey); }
-.num { font-variant-numeric: tabular-nums lining-nums; }
+/* entrance: children marked .rise slide up when their slide opens */
+.rise { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--d, 0) * 90ms + 120ms); }
+.is-active .rise { opacity: 1; transform: none; }
 
-/* Mariner dot-matrix ground, from their brand splash */
-.slide { background-color: var(--black); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect x='15' y='15' width='2' height='2' fill='%23D3FF28' fill-opacity='.28'/%3E%3C/svg%3E"); background-position: 0 0; }
-.halftone { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* shared type */
+.overline { font-family: var(--tech); font-size: 15px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--lime); }
+.title { font-family: var(--display); font-weight: 400; font-size: 76px; line-height: 1.02; letter-spacing: -.01em; color: var(--white); }
+.label { font-family: var(--tech); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); }
+.num { font-variant-numeric: lining-nums tabular-nums; }
+.rule-l { border-left: 3px solid var(--lime); padding-left: 26px; }
+
+/* slide chrome: Mariner left, Stream right */
+.slide-head { position: absolute; z-index: 2; left: 80px; right: 80px; top: 44px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.mariner-mark { height: 22px; width: auto; }
+.stream-mark { height: 28px; width: auto; filter: brightness(0) invert(1); opacity: .92; }
+
+.btn { display: inline-flex; align-items: center; gap: 12px; background: var(--lime); color: var(--black); border: 0; padding: 14px 24px; font-family: var(--tech); font-weight: 500; font-size: 18px; letter-spacing: .02em; cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
+.btn:hover { background: var(--white); }
+.btn .arr { transition: transform .25s; }
+.btn:hover .arr { transform: translateX(4px); }
 
 /* ---------- 1. cover ---------- */
-.cover-map { position: absolute; right: -40px; top: 60px; width: 1060px; height: auto; }
-.cover-map .st { fill: none; stroke: rgba(255,255,255,.10); stroke-width: 1; }
-.cover-map .route { fill: none; stroke: var(--lime); stroke-width: 3.5; stroke-linecap: square; }
-.cover-map .route-draw { stroke-dasharray: 520; stroke-dashoffset: 520; animation: draw 2.2s .4s cubic-bezier(.6,.1,.3,1) forwards; }
-.cover-map .pin { fill: var(--lime); }
-.cover-map .pin-ring { fill: none; stroke: var(--lime); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: ping 2.4s 2.4s ease-out infinite; }
-.cover-map text { font-family: var(--mono); font-size: 13px; letter-spacing: .08em; fill: var(--white); text-transform: uppercase; }
-@keyframes draw { to { stroke-dashoffset: 0; } }
-@keyframes ping { 0% { transform: scale(1); opacity: .9 } 100% { transform: scale(3.2); opacity: 0 } }
-.cover-copy { position: absolute; left: 80px; top: 210px; width: 820px; display: grid; gap: 30px; }
-.cover-logo { width: 560px; height: auto; }
-.cover-copy h1 { font-family: var(--display); font-weight: 500; font-size: 84px; line-height: 1; letter-spacing: -.01em; color: var(--white); }
-.cover-copy p { font-size: 28px; line-height: 1.35; color: var(--text); max-width: 34ch; }
-.cta { justify-self: start; background: var(--lime); color: var(--black); font-family: var(--display); font-weight: 500; font-size: 22px; padding: 14px 28px; display: inline-flex; gap: 12px; align-items: center; border: 0; cursor: pointer; transition: filter .2s; }
-.cta:hover { filter: brightness(1.08); }
-.manifest { position: absolute; left: 80px; right: 80px; bottom: 52px; margin: 0; display: grid; grid-template-columns: 1fr 1.3fr 1fr .8fr; border-top: 1px solid var(--rule); }
-.manifest div { padding: 16px 20px 0 0; display: grid; gap: 6px; }
-.manifest dd { margin: 0; font-size: 20px; font-weight: 500; color: var(--white); }
+#cover { background: var(--black); }
+.cover-photo { position: absolute; left: -40px; right: -40px; bottom: -20px; height: 560px; background: url("assets/photos/network-globe.jpg") 0% 100% / cover no-repeat; transform: translate(var(--px, 0), var(--py, 0)) scale(1.04); transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+.cover-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #000 0%, rgba(0,0,0,0) 38%, rgba(0,0,0,0) 80%, rgba(0,0,0,.6) 100%); }
+.is-active .cover-photo { animation: drift 24s ease-in-out infinite alternate; }
+@keyframes drift { from { background-position: 0% 100%; } to { background-position: 18% 100%; } }
+.cover-top { position: absolute; left: 80px; right: 80px; top: 64px; display: flex; justify-content: space-between; align-items: center; }
+.cover-top .overline { color: var(--white); font-size: 17px; letter-spacing: .2em; }
+.cover-band { position: absolute; left: 0; right: 0; top: 210px; height: 470px; background: rgba(13, 26, 46, .80); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); border-top: 1px solid var(--lime-line); border-bottom: 1px solid var(--lime-line); }
+.cover-copy { position: absolute; left: 80px; right: 80px; top: 290px; display: grid; gap: 34px; justify-items: start; }
+.cover-logo { width: 600px; height: auto; }
+.cover-copy h1 { font-family: var(--display); font-weight: 500; font-size: 86px; line-height: 1; letter-spacing: -.012em; color: var(--white); margin-top: 18px; }
+.cover-copy .sub { font-size: 36px; font-weight: 300; color: var(--text); margin-top: -12px; }
+.cover-foot { position: absolute; left: 80px; right: 80px; bottom: 56px; display: flex; justify-content: space-between; align-items: end; }
+.cover-foot .stream-mark { height: 40px; }
 
 /* ---------- 2. team ---------- */
-.team-grid { position: absolute; left: 80px; right: 80px; top: 118px; bottom: 56px; display: grid; grid-template-columns: 1fr 470px; gap: 56px; }
-.team-main { display: grid; grid-template-rows: auto 1fr auto; gap: 28px; min-width: 0; }
-.people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.person { margin: 0; border: 0; padding: 0; background: none; text-align: left; cursor: pointer; display: grid; gap: 14px; }
-.person .ph { position: relative; aspect-ratio: 4 / 4.2; overflow: hidden; background: var(--panel); }
-.person img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; transition: transform .5s cubic-bezier(.3,.7,.3,1), filter .4s; filter: grayscale(.35); }
-.person .ph::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--lime); transform: scaleX(0); transform-origin: left; transition: transform .4s cubic-bezier(.3,.7,.3,1); }
-.person:hover img, .person[aria-pressed="true"] img { transform: scale(1.04); filter: none; }
-.person:hover .ph::after, .person[aria-pressed="true"] .ph::after { transform: scaleX(1); }
-.person h3 { font-family: var(--display); font-weight: 600; font-size: 34px; line-height: 1; color: var(--white); }
-.person p { font-size: 19px; color: var(--grey); margin-top: 4px; }
-.results { background: var(--lime); color: var(--black); padding: 24px 34px 28px; display: grid; grid-template-columns: auto repeat(3, 1fr); gap: 34px; align-items: end; }
-.results .label { color: var(--black); opacity: .7; align-self: center; line-height: 1.5; }
-.result-val { font-family: var(--display); font-weight: 700; font-size: 80px; line-height: .9; }
-.result-val small { font-size: .5em; margin-left: 4px; }
-.result-lbl { font-size: 18px; font-weight: 500; margin-top: 6px; }
-.clients { display: grid; grid-template-rows: auto auto 1fr auto; gap: 18px; min-width: 0; }
-.clients h3 { font-family: var(--display); font-weight: 600; font-size: 36px; line-height: 1; color: var(--white); }
-.client-grid { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
-.client { position: relative; background: var(--panel); min-height: 72px; display: grid; place-items: center; padding: 0 14px; text-align: center; transition: background .25s; }
-.client:hover { background: var(--panel-2); }
-.client .wm { font-size: 23px; line-height: 1; color: var(--white); }
-.client.known { box-shadow: inset 0 0 0 2px var(--lime); }
-.client.known::before { content: ""; position: absolute; top: 12px; right: 12px; width: 10px; height: 10px; background: var(--lime); }
-.client-note { font-size: 16px; color: var(--grey); display: flex; gap: 10px; align-items: center; }
-.client-note i { width: 10px; height: 10px; background: var(--lime); flex: none; }
-/* typographic wordmarks until hi-res logo files are dropped in */
-.wm-chr { font-family: var(--display); font-weight: 600; letter-spacing: .1em; }
-.wm-shipbob { font-family: var(--body); font-weight: 600; letter-spacing: -.01em; }
-.wm-crst { font-family: var(--display); font-weight: 700; font-size: 30px !important; letter-spacing: .14em; }
-.wm-scot { font-family: var(--display); font-weight: 700; font-style: italic; letter-spacing: .04em; text-transform: uppercase; }
+.team-main { position: absolute; left: 80px; top: 128px; bottom: 64px; width: 960px; display: grid; grid-template-rows: auto 1fr; gap: 44px; }
+.people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: start; }
+.person { position: relative; display: grid; gap: 18px; }
+.person .ph { position: relative; aspect-ratio: 4 / 5.3; overflow: hidden; background: var(--navy-2); border: 0; padding: 0; width: 100%; cursor: pointer; display: block; text-align: left; }
+.person img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 16%; filter: grayscale(1) contrast(1.05); transition: transform .6s cubic-bezier(.3,.7,.3,1), filter .5s; }
+.person .ph:hover img, .person.open img { filter: none; transform: scale(1.04); }
+.person .ph::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, transparent 55%, rgba(13,26,46,.55)); pointer-events: none; }
+.person .hint { position: absolute; z-index: 2; right: 0; top: 0; background: var(--lime); color: var(--black); font-family: var(--tech); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; padding: 6px 10px; transition: opacity .3s; }
+.person.open .hint { opacity: 0; }
+.drawer { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; background: var(--lime); color: var(--black); padding: 18px 20px 20px; display: grid; gap: 6px; transform: translateY(101%); transition: transform .45s cubic-bezier(.3,.7,.2,1); }
+.person.open .drawer { transform: none; }
+.drawer a { font-family: var(--tech); font-size: 17px; font-weight: 500; text-decoration: none; display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(0,0,0,.25); padding: 4px 0; }
+.drawer a:hover { border-bottom-color: #000; }
+.person h3 { font-family: var(--display); font-weight: 600; font-size: 32px; line-height: 1.05; color: var(--white); }
+.person p { font-size: 20px; color: var(--grey); margin-top: 4px; }
+.clients-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 480px; padding: 128px 64px 64px 56px; display: grid; grid-template-rows: auto auto 1fr; gap: 16px; border-left: 1px solid var(--lime-line);
+  background: linear-gradient(180deg, rgba(13,26,46,.93), rgba(13,26,46,.80) 60%, rgba(13,26,46,.93)), url("assets/photos/truck-highway.jpg") 62% 50% / cover; }
+.clients-panel h3 { font-family: var(--display); font-weight: 500; font-size: 38px; line-height: 1; color: var(--white); margin-bottom: 8px; }
+.client-grid { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 1px; background: var(--lime-line); border: 1px solid var(--lime-line); }
+.client { position: relative; background: rgba(0, 10, 40, .78); display: grid; place-items: center; padding: 0 12px; text-align: center; transition: background .25s, color .25s; color: var(--white); }
+.client:hover { background: var(--lime); color: var(--black); }
+.client:hover .wm-fwf { border-color: var(--black); }
+.client .wm { font-size: 23px; line-height: 1; }
+/* typographic wordmarks until logo files are dropped in */
+.wm-chr { font-family: var(--display); font-weight: 600; letter-spacing: .1em; font-size: 19px !important; }
+.wm-shipbob { font-family: var(--body); font-weight: 700; letter-spacing: -.01em; }
+.wm-crst { font-family: var(--tech); font-weight: 600; font-size: 30px !important; letter-spacing: .1em; }
+.wm-scot { font-family: var(--display); font-weight: 800; font-style: italic; letter-spacing: .04em; text-transform: uppercase; }
 .wm-hirsch { font-family: var(--body); font-weight: 600; font-style: italic; }
-.wm-fwf { font-family: var(--display); font-weight: 700; font-size: 28px !important; border: 2px solid var(--white); padding: 2px 12px; }
+.wm-fwf { font-family: var(--display); font-weight: 800; font-size: 26px !important; border: 2px solid var(--white); padding: 2px 12px; transition: border-color .25s; }
 .wm-loadsmart { font-family: var(--body); font-weight: 600; letter-spacing: -.02em; text-transform: lowercase; }
-.wm-flock { font-family: var(--display); font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
-.wm-flock small { display: block; font-family: var(--body); font-size: 13px; letter-spacing: .04em; text-transform: none; margin-top: 4px; color: var(--grey); }
-.wm-schneider { font-family: var(--display); font-weight: 700; font-style: italic; letter-spacing: .06em; text-transform: uppercase; }
-.wm-bestbay { font-family: var(--display); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.wm-flock { font-family: var(--tech); font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
+.wm-flock small { display: block; font-family: var(--body); font-size: 13px; letter-spacing: .04em; text-transform: none; margin-top: 3px; opacity: .7; }
+.wm-schneider { font-family: var(--display); font-weight: 800; font-style: italic; letter-spacing: .05em; text-transform: uppercase; }
+.wm-bestbay { font-family: var(--display); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: 20px !important; }
 
 /* ---------- 3. stream ---------- */
-.stream-grid { position: absolute; left: 80px; right: 80px; top: 112px; bottom: 52px; display: grid; grid-template-columns: 700px 1fr; grid-template-rows: 1fr auto; column-gap: 40px; row-gap: 22px; }
-.stream-grid .title { font-size: 68px; white-space: nowrap; }
-.stream-left { display: grid; gap: 18px; align-content: start; min-width: 0; }
-.stream-left .tag { font-size: 23px; color: var(--text); }
-.services { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 26px; }
-.services li { font-size: 17px; font-weight: 500; padding: 5px 0; border-bottom: 1px solid var(--rule); display: flex; gap: 10px; align-items: baseline; color: var(--white); }
-.services li::before { content: ""; width: 7px; height: 7px; background: var(--lime); flex: none; transform: translateY(-2px); }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 26px; }
-.stat-val { font-family: var(--display); font-weight: 600; font-size: 54px; line-height: .95; color: var(--white); }
-.stat-lbl { font-size: 16px; color: var(--grey); margin-top: 2px; }
-.map-wrap { position: relative; display: grid; grid-template-rows: auto 1fr; gap: 10px; min-width: 0; }
-.map-tools { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
-.chip { border: 1px solid var(--rule); background: var(--panel); padding: 8px 14px; font-family: var(--mono); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; transition: background .2s, border-color .2s, opacity .2s; }
-.chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--white); }
-.chip.mar i { border-radius: 0; background: var(--lime); }
-.chip[aria-pressed="false"] { opacity: .45; }
-.chip:hover { border-color: var(--grey); }
-.usmap { width: 100%; height: 100%; }
-.usmap .st { fill: var(--panel-2); stroke: var(--black); stroke-width: 1; }
-.usmap .st.hl { fill: #33383C; }
-.usmap .dot { fill: var(--white); stroke: var(--black); stroke-width: 2; cursor: pointer; transition: r .2s; }
-.usmap .dot:hover, .usmap .dot:focus { r: 10; outline: none; }
-.usmap .mdot { fill: var(--lime); stroke: var(--black); stroke-width: 2.5; cursor: pointer; }
-.usmap .mlbl { font-family: var(--mono); font-size: 13px; fill: var(--lime); font-weight: 500; letter-spacing: .04em; }
+.partner-main { position: absolute; left: 80px; top: 112px; bottom: 44px; width: 990px; display: grid; grid-template-rows: auto 1fr auto; gap: 8px; }
+.partner-main .tag { font-size: 26px; font-weight: 300; color: var(--text); margin-top: 8px; }
+.map-wrap { position: relative; min-height: 0; }
+.usmap { width: 100%; height: 100%; display: block; }
+.usmap .st { fill: var(--navy-3); stroke: var(--black); stroke-width: .8; }
+.usmap .st.hl { fill: url(#hatch); }
+.usmap .dot { fill: var(--white); stroke: var(--black); stroke-width: 2; cursor: pointer; transition: fill .2s; }
+.usmap .dot:hover, .usmap .dot:focus, .usmap .dot.on { fill: var(--lime); outline: none; }
+.usmap .rlbl { font-family: var(--tech); font-size: 14px; font-weight: 500; letter-spacing: .1em; fill: var(--grey); text-transform: uppercase; cursor: pointer; transition: fill .2s; }
+.usmap .rlbl.on, .usmap .rlbl:hover { fill: var(--lime); }
+.usmap .lead { stroke: var(--grey); stroke-width: .8; opacity: .6; }
 .usmap .layer { transition: opacity .3s; }
 .usmap .layer.off { opacity: 0; pointer-events: none; }
-.map-tip { position: absolute; pointer-events: none; background: var(--lime); color: var(--black); font-family: var(--mono); font-size: 13px; letter-spacing: .06em; padding: 6px 10px; white-space: nowrap; transform: translate(-50%, calc(-100% - 14px)); }
-.diff { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.diff article { background: var(--panel); border: 1px solid var(--rule); padding: 18px 26px; display: grid; gap: 6px; }
-.diff h3 { font-family: var(--display); font-weight: 600; font-size: 30px; line-height: 1; color: var(--white); }
-.diff h3 b { color: var(--lime); font-weight: 600; }
-.diff p { font-size: 18px; color: var(--text); line-height: 1.35; }
+.usmap .msq { fill: var(--lime); stroke: var(--black); stroke-width: 2; cursor: pointer; }
+.usmap .msq.on { fill: var(--white); }
+.usmap .ping { fill: none; stroke: var(--lime); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: ping 2.2s ease-out infinite; }
+@keyframes ping { 0% { transform: scale(1); opacity: .9 } 100% { transform: scale(3.4); opacity: 0 } }
+.map-tip { position: absolute; z-index: 3; pointer-events: none; background: var(--lime); color: var(--black); font-family: var(--tech); font-size: 14px; font-weight: 500; letter-spacing: .04em; padding: 6px 10px; white-space: nowrap; transform: translate(-50%, calc(-100% - 14px)); }
+.map-tip small { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .7; }
+.stats { display: grid; grid-template-columns: repeat(6, auto); justify-content: space-between; border-top: 1px solid var(--lime-line); padding-top: 22px; }
+.stats > div { padding: 0 22px; border-left: 1px solid var(--rule); text-align: center; }
+.stats > div:first-child { border-left: 0; padding-left: 0; }
+.stats > div:last-child { padding-right: 0; }
+.stat-val { font-family: var(--display); font-weight: 400; font-size: 50px; line-height: 1; color: var(--lime); white-space: nowrap; }
+.stat-val small { font-size: .55em; margin-left: 3px; }
+.stat-lbl { font-size: 16px; color: var(--grey); margin-top: 8px; line-height: 1.25; }
+.platform { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; padding: 112px 60px 44px 56px; display: grid; grid-template-rows: auto auto auto auto 1fr; gap: 22px; border-left: 1px solid var(--lime-line);
+  background: linear-gradient(180deg, rgba(0,10,40,.90), rgba(13,26,46,.94)), url("assets/photos/city-network.jpg") 30% 70% / cover; }
+.platform h3 { font-family: var(--display); font-weight: 500; font-size: 32px; line-height: 1; color: var(--white); }
+.values { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.value { display: grid; justify-items: center; gap: 10px; cursor: default; }
+.value .ic { width: 70px; height: 70px; border: 1.5px solid var(--lime); display: grid; place-items: center; transition: background .25s; }
+.value svg { width: 34px; height: 34px; fill: none; stroke: var(--lime); stroke-width: 1.8; stroke-linecap: square; transition: stroke .25s; }
+.value:hover .ic { background: var(--lime); }
+.value:hover svg { stroke: var(--black); }
+.value span { font-family: var(--tech); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--white); }
+.platform hr { border: 0; border-top: 1px solid var(--lime-line); margin: 4px 0; width: 100%; }
+.services { list-style: none; padding: 0; display: grid; align-content: start; }
+.services li { font-size: 19px; font-weight: 500; padding: 7px 0; border-bottom: 1px solid var(--rule); display: flex; gap: 12px; align-items: center; color: var(--white); }
+.services li::before { content: ""; width: 7px; height: 7px; background: var(--lime); flex: none; }
+.services li.lead-svc { color: var(--lime); }
+.services li.lead-svc::after { content: "Your team"; margin-left: auto; font-family: var(--tech); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--black); background: var(--lime); padding: 3px 7px; }
 
-/* ---------- 4. locations ---------- */
-.loc-head { position: absolute; left: 80px; right: 80px; top: 118px; display: flex; justify-content: space-between; align-items: end; gap: 40px; }
-.loc-head p { font-size: 22px; color: var(--grey); max-width: 36ch; }
-.draft { font-family: var(--mono); font-size: 14px; letter-spacing: .1em; text-transform: uppercase; color: var(--lime); border: 1.5px dashed var(--lime); padding: 8px 14px; }
-.loc-grid { position: absolute; left: 80px; right: 80px; top: 300px; bottom: 60px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-.loc { border: 1.5px dashed #464C51; background: var(--panel); padding: 28px 30px; display: grid; grid-template-rows: auto auto 1fr; gap: 18px; text-align: left; cursor: pointer; transition: border-color .25s, transform .3s; }
-.loc.filled { border-style: solid; border-color: var(--rule); }
-.loc:hover, .loc[aria-pressed="true"] { border-color: var(--lime); transform: translateY(-4px); }
-.loc .code { font-family: var(--mono); font-size: 14px; letter-spacing: .12em; color: var(--lime); text-transform: uppercase; }
-.loc h3 { font-family: var(--display); font-size: 40px; font-weight: 600; line-height: 1; color: var(--white); }
-.loc dl { margin: 0; display: grid; grid-template-columns: auto 1fr; align-content: start; }
-.loc dt, .loc dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 18px; }
-.loc dt { color: var(--grey); padding-right: 16px; }
-.loc dd { text-align: right; font-weight: 500; color: var(--white); }
-.loc dd.tbd { color: var(--grey); font-weight: 400; font-family: var(--mono); font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+/* ---------- 4. footprint ---------- */
+.fp-main { position: absolute; left: 80px; top: 128px; bottom: 56px; width: 990px; display: grid; grid-template-rows: auto 1fr; gap: 12px; }
+.fp-headrow { display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.chip { white-space: nowrap; border: 1px solid var(--lime-line); background: rgba(0,10,40,.6); padding: 8px 14px; font-family: var(--tech); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; transition: background .2s, color .2s, opacity .2s; }
+.chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--white); }
+.chip.sq i { border-radius: 0; background: var(--lime); }
+.chip[aria-pressed="false"] { opacity: .5; }
+.chip:hover { border-color: var(--lime); }
+.draft { font-family: var(--tech); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); border: 1.5px dashed var(--lime); padding: 7px 12px; }
+.fp-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; display: grid; grid-template-rows: 250px auto 1fr; border-left: 1px solid var(--lime-line); background: rgba(0,10,40,.55); }
+.fp-photo { background: linear-gradient(180deg, rgba(13,26,46,0) 50%, var(--navy)), url("assets/photos/truck-wireframe.jpg") 45% 55% / cover; border-bottom: 1px solid var(--lime-line); }
+.fp-stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 26px 40px 20px; gap: 0; border-bottom: 1px solid var(--lime-line); }
+.fp-stats > div { border-left: 1px solid var(--rule); padding-left: 18px; }
+.fp-stats > div:first-child { border-left: 0; padding-left: 0; }
+.fp-stats .stat-val { font-size: 44px; }
+.fp-stats .stat-lbl { font-size: 14px; }
+.site-list { list-style: none; padding: 18px 40px 32px; display: grid; align-content: start; gap: 8px; overflow: auto; }
+.site { border: 1px solid var(--rule); background: rgba(13,26,46,.7); padding: 12px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: center; cursor: pointer; text-align: left; width: 100%; transition: border-color .2s, background .2s; }
+.site:hover, .site.on { border-color: var(--lime); background: rgba(211,255,40,.08); }
+.site i { width: 10px; height: 10px; background: var(--lime); grid-row: span 2; }
+.site b { font-family: var(--display); font-weight: 600; font-size: 19px; color: var(--white); }
+.site small { grid-column: 2; font-size: 14px; color: var(--grey); }
+.site em { grid-row: 1 / span 2; grid-column: 3; font-style: normal; font-family: var(--tech); font-size: 13px; letter-spacing: .08em; color: var(--lime); text-transform: uppercase; }
+.site.empty { border-style: dashed; cursor: default; }
+.site.empty i { background: transparent; border: 1.5px dashed var(--grey); }
+.site.empty b { color: var(--grey); font-weight: 400; }
 
 /* ---------- 5. close ---------- */
-.close-copy { position: absolute; left: 80px; top: 190px; display: grid; gap: 26px; }
-.close-copy h2 { font-family: var(--display); font-weight: 600; font-size: 210px; line-height: .85; letter-spacing: -.02em; color: var(--white); }
-.close-copy p { font-size: 28px; color: var(--text); }
+#close { background: linear-gradient(90deg, rgba(0,0,0,.96) 0%, rgba(0,0,0,.82) 45%, rgba(0,0,0,.35) 100%), url("assets/photos/city-night.jpg") 50% 50% / cover; }
+.close-icon { position: absolute; left: 80px; top: 92px; width: 128px; height: auto; }
+.close-copy { position: absolute; left: 80px; top: 250px; display: grid; gap: 18px; }
+.close-copy h2 { font-family: var(--display); font-weight: 500; font-size: 180px; line-height: .9; letter-spacing: -.02em; color: var(--white); }
+.close-copy p { font-size: 28px; font-weight: 300; color: var(--text); }
 .close-copy p b { color: var(--lime); font-weight: 500; }
-.close-icon { position: absolute; right: 80px; top: 190px; width: 260px; height: auto; }
-.contacts { position: absolute; left: 80px; right: 80px; bottom: 60px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; border-top: 1px solid var(--rule); padding-top: 28px; }
-.contact { display: grid; grid-template-columns: 96px 1fr; gap: 20px; align-items: center; }
-.contact img { width: 96px; height: 96px; object-fit: cover; object-position: 50% 18%; }
-.contact h3 { font-family: var(--display); font-weight: 600; font-size: 32px; color: var(--white); line-height: 1; }
-.contact p { font-size: 18px; color: var(--grey); margin-top: 4px; }
+.contacts { position: absolute; left: 80px; right: 80px; top: 548px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; }
+.contact h3 { font-family: var(--display); font-weight: 600; font-size: 28px; color: var(--white); line-height: 1.1; }
+.contact > p { font-size: 18px; color: var(--grey); margin: 2px 0 12px; }
+.clink { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); font-family: var(--tech); font-size: 17px; letter-spacing: .02em; color: var(--text); text-decoration: underline; text-decoration-color: rgba(250,251,255,.35); text-underline-offset: 4px; transition: color .2s, border-color .2s; background: none; border-top: 0; border-left: 0; border-right: 0; width: 100%; cursor: pointer; text-align: left; }
+.clink::after { content: "›"; font-size: 22px; line-height: 1; transition: transform .2s; }
+.clink:hover { color: var(--lime); border-bottom-color: var(--lime); text-decoration-color: var(--lime); }
+.clink:hover::after { transform: translateX(4px); }
+.clink.vcf { text-decoration: none; color: var(--grey); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
+.close-foot { position: absolute; left: 80px; right: 80px; bottom: 44px; display: flex; justify-content: space-between; align-items: center; }
+.close-foot .label { color: var(--grey); }
 
 /* ---------- route nav ---------- */
-.nav { position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); padding: 0 20px env(safe-area-inset-bottom, 0px); display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; background: var(--black); border-top: 1px solid var(--rule); color: var(--text); z-index: 5; }
+.nav { position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); padding: 0 20px env(safe-area-inset-bottom, 0px); display: grid; grid-template-columns: auto 1fr auto; gap: 28px; align-items: center; background: var(--black); border-top: 1px solid var(--lime-line); color: var(--text); z-index: 5; }
 .nav-btns { display: flex; gap: 6px; align-items: center; }
 .nav button.ctl { width: 40px; height: 40px; border: 1px solid var(--rule); background: transparent; cursor: pointer; display: grid; place-items: center; font-size: 18px; transition: background .2s, border-color .2s, color .2s; }
 .nav button.ctl:hover { background: var(--lime); border-color: var(--lime); color: var(--black); }
 .nav button.ctl:disabled { opacity: .3; cursor: default; background: transparent; color: var(--text); border-color: var(--rule); }
 .route-nav { position: relative; display: flex; justify-content: space-between; list-style: none; margin: 0; padding: 0 8px; }
-.route-nav::before, .route-nav .run { content: ""; position: absolute; left: 14px; right: 14px; top: 9px; height: 3px; background: var(--rule); }
+.route-nav::before, .route-nav .run { content: ""; position: absolute; left: 16px; right: 16px; top: 8px; height: 2px; background: var(--rule); }
 .route-nav .run { right: auto; background: var(--lime); width: 0; transition: width .5s cubic-bezier(.4,.1,.2,1); }
-.route-nav button { position: relative; border: 0; background: none; cursor: pointer; display: grid; justify-items: center; gap: 4px; padding: 0; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--grey); }
-.route-nav button::before { content: ""; width: 20px; height: 20px; background: var(--black); border: 3px solid #464C51; box-sizing: border-box; transition: border-color .3s, background .3s, transform .3s; }
+.route-nav button { position: relative; border: 0; background: none; cursor: pointer; display: grid; justify-items: center; gap: 5px; padding: 0; font-family: var(--tech); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--grey); }
+.route-nav button::before { content: ""; width: 18px; height: 18px; background: var(--black); border: 2px solid #3A4458; transition: border-color .3s, background .3s, transform .3s; }
 .route-nav button.passed::before { border-color: var(--lime); }
 .route-nav button[aria-current="step"]::before { background: var(--lime); border-color: var(--lime); transform: scale(1.15); }
-.route-nav button[aria-current="step"] { color: var(--white); }
-.counter { font-family: var(--mono); font-size: 13px; letter-spacing: .1em; color: var(--grey); min-width: 64px; text-align: right; }
+.route-nav button[aria-current="step"], .route-nav button:hover { color: var(--white); }
+.counter { font-family: var(--tech); font-size: 14px; letter-spacing: .1em; color: var(--grey); min-width: 64px; text-align: right; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .cover-map .route-draw { stroke-dashoffset: 0; }
+  .rise { opacity: 1; transform: none; }
 }
 
 /* ---------- phones and narrow windows: stacked scroll layout ---------- */
@@ -207,37 +242,59 @@ button { font: inherit; color: inherit; }
   body { overflow: auto; }
   .viewport { position: static; overflow: visible; }
   .stage { position: static; width: auto; height: auto; transform: none; }
-  .slide { position: relative; inset: auto; opacity: 1; visibility: visible; outline: 0; border-bottom: 1px solid var(--rule); padding: 40px 16px 48px; display: grid; gap: 28px; }
+  .slide { position: relative; inset: auto; opacity: 1; visibility: visible; outline: 0; border-bottom: 1px solid var(--lime-line); padding: 36px 16px 44px; display: grid; gap: 28px; }
   .slide > * { position: static !important; width: auto !important; }
+  .rise { opacity: 1; transform: none; }
   .slide-head { order: -1; }
-  .mariner-mark { height: 20px; }
+  .mariner-mark { height: 16px; }
   .stream-mark { height: 22px; }
   .nav { display: none; }
-  .title, .stream-grid .title { font-size: 46px; white-space: normal; }
-  .cover-copy { gap: 20px; }
-  .cover-logo { width: 100%; max-width: 360px; }
-  .cover-copy h1 { font-size: 44px; }
-  .cover-copy p { font-size: 19px; }
-  .halftone { display: none; }
-  .manifest { grid-template-columns: 1fr 1fr; gap: 12px; }
-  .manifest dd { font-size: 16px; }
-  .team-grid, .stream-grid { display: grid; grid-template-columns: 1fr; gap: 28px; }
-  .people { gap: 12px; }
-  .person h3 { font-size: 20px; }
-  .person p { font-size: 14px; }
-  .results { grid-template-columns: 1fr 1fr 1fr; gap: 14px; padding: 18px; }
-  .results .label { grid-column: 1 / -1; }
-  .result-val { font-size: 38px; }
-  .result-lbl { font-size: 14px; }
-  .services { grid-template-columns: 1fr; }
-  .stat-val { font-size: 38px; }
-  .stats { grid-template-columns: repeat(2, 1fr); }
-  .diff { grid-template-columns: 1fr; }
-  .loc-head { flex-direction: column; align-items: start; gap: 16px; }
-  .loc-grid { grid-template-columns: 1fr; }
-  .close-copy h2 { font-size: 96px; }
-  .contacts { grid-template-columns: 1fr; }
-  .close-icon { width: 120px; }
+  .title { font-size: 42px; }
+  .overline { font-size: 13px; }
+
+  #cover { padding-bottom: 0; }
+  .cover-photo { height: 220px; margin: 0 -16px; order: 5; transform: none; }
+  .cover-top { flex-direction: column; align-items: start; gap: 6px; }
+  .cover-top .overline { font-size: 14px; }
+  .cover-band { display: none; }
+  .cover-copy { gap: 22px; }
+  .cover-logo { width: 100%; max-width: 340px; }
+  .cover-copy h1 { font-size: 42px; margin-top: 6px; }
+  .cover-copy .sub { font-size: 22px; margin-top: 0; }
+  .cover-foot .stream-mark { height: 30px; }
+
+  .team-main { gap: 24px; }
+  .people { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .person h3 { font-size: 21px; }
+  .person p { font-size: 15px; }
+  .drawer { padding: 10px; }
+  .drawer a { font-size: 12px; }
+  .clients-panel, .platform, .fp-panel { margin: 0 -16px; padding: 28px 16px; border-left: 0; border-top: 1px solid var(--lime-line); }
+  .client { min-height: 64px; }
+  .client .wm { font-size: 18px; }
+
+  .partner-main, .fp-main { gap: 20px; }
+  .partner-main .tag { font-size: 19px; }
+  .map-wrap { height: auto; }
+  .usmap { height: auto; }
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 18px 0; }
+  .stats > div { border-left: 0; padding: 0; text-align: left; }
+  .stat-val { font-size: 36px; }
+  .values { gap: 6px; }
+  .value .ic { width: 56px; height: 56px; }
+  .services li { font-size: 16px; }
+
+  .fp-headrow { flex-direction: column; align-items: start; }
+  .chips { justify-content: start; }
+  .fp-panel { grid-template-rows: 160px auto auto; padding: 0; }
+  .fp-stats { padding: 20px 16px; }
+  .site-list { padding: 16px; }
+
+  .close-icon { width: 80px; }
+  .close-copy h2 { font-size: 84px; }
+  .close-copy p { font-size: 20px; }
+  .contacts { grid-template-columns: 1fr; gap: 28px; }
+  .close-foot { flex-direction: column; align-items: start; gap: 16px; }
 }
 </style>
 </head>
@@ -247,167 +304,158 @@ button { font: inherit; color: inherit; }
   <div class="stage" id="stage">
 
     <!-- 1. Cover -->
-    <section class="slide" id="cover" data-name="Cover" aria-label="Cover">
-      <header class="slide-head">
-        <span class="label">Prepared for Justin Turner, CEO</span>
-        <img class="stream-mark" src="assets/stream-logo-navy.png" alt="Stream Realty Partners">
-      </header>
-      <canvas class="halftone" id="halftone" width="1600" height="900" aria-hidden="true"></canvas>
-      <div class="cover-copy">
-        <img class="cover-logo" src="assets/mariner-logo.png" alt="Mariner">
-        <h1>Sourced.<span class="lime">Negotiated.</span>Delivered.</h1>
-        <p>Real estate strategy for an asset-backed 4PL, from Stream's Chicago Tenant Representation team.</p>
-        <button class="cta" type="button" data-go="1">Meet the team →</button>
+    <section class="slide" id="cover" data-name="Cover" aria-label="Space for what moves you forward">
+      <div class="cover-photo" id="coverPhoto" aria-hidden="true"></div>
+      <div class="cover-band" aria-hidden="true"></div>
+      <div class="cover-top">
+        <span class="overline rise">October 2026</span>
+        <span class="label rise" style="--d:1">Prepared for Mariner Logistics</span>
       </div>
-      <dl class="manifest">
-        <div><dt class="label">Client</dt><dd>Mariner Logistics</dd></div>
-        <div><dt class="label">Origin</dt><dd>Coppell, TX · 32.95° N 97.02° W</dd></div>
-        <div><dt class="label">Advisor</dt><dd>Stream Realty Partners</dd></div>
-        <div><dt class="label">Date</dt><dd>October 2026</dd></div>
-      </dl>
+      <div class="cover-copy">
+        <img class="cover-logo rise" style="--d:1" src="assets/mariner-logo.svg" alt="Mariner">
+        <h1 class="rise" style="--d:2">Space For What <span class="lime">Moves You Forward</span></h1>
+        <p class="sub rise" style="--d:3">Real Estate Strategy &amp; Advisory</p>
+      </div>
+      <div class="cover-foot">
+        <img class="stream-mark rise" style="--d:4" src="assets/stream-logo-navy.png" alt="Stream Realty Partners">
+        <button class="btn rise" style="--d:4" type="button" data-go="1">Meet the team <span class="arr">→</span></button>
+      </div>
     </section>
 
     <!-- 2. Team -->
-    <section class="slide" id="team" data-name="Team" aria-label="Chicago Tenant Rep Team">
+    <section class="slide navy" id="team" data-name="Team" aria-label="Your business, our focus">
       <header class="slide-head">
-        <img class="mariner-mark" src="assets/mariner-logo.png" alt="Mariner">
+        <img class="mariner-mark" src="assets/mariner-logo.svg" alt="Mariner">
         <img class="stream-mark" src="assets/stream-logo-navy.png" alt="Stream Realty Partners">
       </header>
-      <div class="team-grid">
-        <div class="team-main">
-          <div style="display:grid;gap:12px">
-            <span class="eyebrow">Your team</span>
-            <h2 class="title">Chicago Tenant Rep Team</h2>
-          </div>
-          <div class="people">
-            <button class="person" type="button" aria-pressed="false">
-              <div class="ph"><img src="assets/adrian-boone.jpg" alt="Adrian Boone"></div>
-              <div><h3>Adrian Boone</h3><p>Vice President</p></div>
-            </button>
-            <button class="person" type="button" aria-pressed="false">
-              <div class="ph"><img src="assets/jordan-decker.jpg" alt="Jordan Decker"></div>
-              <div><h3>Jordan Decker</h3><p>Managing Director</p></div>
-            </button>
-            <button class="person" type="button" aria-pressed="false">
-              <div class="ph"><img src="assets/phil-geiger.jpg" alt="Phil Geiger"></div>
-              <div><h3>Phil Geiger</h3><p>Managing Director</p></div>
-            </button>
-          </div>
-          <div class="results">
-            <span class="label">2025<br>Results</span>
-            <div><div class="result-val num" data-count="50">50</div><div class="result-lbl">Transactions</div></div>
-            <div><div class="result-val num" data-count="195" data-prefix="$" data-suffix="M">$195<small>M</small></div><div class="result-lbl">Transaction volume</div></div>
-            <div><div class="result-val num" data-count="1.5" data-decimals="1" data-suffix="M">1.5<small>M</small></div><div class="result-lbl">Square feet</div></div>
-          </div>
+      <div class="team-main">
+        <div style="display:grid;gap:14px">
+          <span class="overline rise">Chicago Tenant Representation</span>
+          <h2 class="title rise" style="--d:1">Your Business, <span class="lime">Our Focus</span></h2>
         </div>
-        <aside class="clients">
-          <span class="eyebrow">Representative clients</span>
-          <h3>Logistics</h3>
-          <!-- To use real logos: replace a <span class="wm …"> with <img src="assets/clients/name.svg" alt="…" style="max-height:44px;width:auto"> (white versions read best on black) -->
-          <ul class="client-grid">
-            <li class="client"><span class="wm wm-chr">C.H. ROBINSON</span></li>
-            <li class="client"><span class="wm wm-shipbob">ShipBob</span></li>
-            <li class="client"><span class="wm wm-crst">CRST</span></li>
-            <li class="client"><span class="wm wm-scot">Scotlynn</span></li>
-            <li class="client"><span class="wm wm-hirsch">Hirschbach</span></li>
-            <li class="client"><span class="wm wm-fwf">FWF</span></li>
-            <li class="client"><span class="wm wm-loadsmart">loadsmart</span></li>
-            <li class="client known" title="Justin Turner served as Flock Freight's Chief Revenue Officer"><span class="wm wm-flock">Flock<small>Freight</small></span></li>
-            <li class="client"><span class="wm wm-schneider">Schneider</span></li>
-            <li class="client"><span class="wm wm-bestbay">Best Bay</span></li>
-          </ul>
-          <p class="client-note"><i></i>Flock Freight, where Justin served as CRO, is a Stream client.</p>
-        </aside>
+        <div class="people" id="people"></div>
       </div>
+      <aside class="clients-panel">
+        <span class="overline rise" style="--d:2">Representative clients</span>
+        <h3 class="rise" style="--d:3">Logistics</h3>
+        <!-- To use real logos: replace a <span class="wm …"> with <img src="assets/clients/name.svg" alt="…" style="max-height:40px;width:auto"> (white versions read best here) -->
+        <ul class="client-grid rise" style="--d:4">
+          <li class="client"><span class="wm wm-chr">C.H. ROBINSON</span></li>
+          <li class="client"><span class="wm wm-shipbob">ShipBob</span></li>
+          <li class="client"><span class="wm wm-crst">CRST</span></li>
+          <li class="client"><span class="wm wm-scot">Scotlynn</span></li>
+          <li class="client"><span class="wm wm-hirsch">Hirschbach</span></li>
+          <li class="client"><span class="wm wm-fwf">FWF</span></li>
+          <li class="client"><span class="wm wm-loadsmart">loadsmart</span></li>
+          <li class="client"><span class="wm wm-flock">Flock<small>Freight</small></span></li>
+          <li class="client"><span class="wm wm-schneider">Schneider</span></li>
+          <li class="client"><span class="wm wm-bestbay">Best Bay</span></li>
+        </ul>
+      </aside>
     </section>
 
-    <!-- 3. Who is Stream -->
-    <section class="slide" id="stream" data-name="Stream" aria-label="Who is Stream">
-      <header class="slide-head">
-        <img class="mariner-mark" src="assets/mariner-logo.png" alt="Mariner">
+    <!-- 3. Your real estate partner -->
+    <section class="slide" id="partner" data-name="Stream" aria-label="Your real estate partner">
+      <header class="slide-head" style="right:550px">
+        <img class="mariner-mark" src="assets/mariner-logo.svg" alt="Mariner">
         <img class="stream-mark" src="assets/stream-logo-navy.png" alt="Stream Realty Partners">
       </header>
-      <div class="stream-grid">
-        <div class="stream-left">
-          <div style="display:grid;gap:10px">
-            <span class="eyebrow">Who is Stream</span>
-            <h2 class="title">Stream Realty Partners</h2>
-            <p class="tag">Relationships first<span class="lime">.</span> Then real estate<span class="lime">.</span></p>
-          </div>
-          <div style="display:grid;gap:8px">
-            <span class="label">Full-service platform</span>
-            <ul class="services">
-              <li>Tenant Representation</li>
-              <li>National Program Management</li>
-              <li>Construction &amp; Project Mgmt.</li>
-              <li>Landlord Representation</li>
-              <li>Property Management</li>
-              <li>Investment Sales</li>
-              <li>Workplace Strategy</li>
-              <li>Location &amp; Labor Intelligence</li>
-              <li>Investment Management</li>
-              <li>Marketing &amp; Research</li>
-              <li>Development</li>
-            </ul>
-          </div>
-          <div class="stats">
-            <div><div class="stat-val num" data-count="30">30</div><div class="stat-lbl">Years in operation</div></div>
-            <div><div class="stat-val num" data-count="20">20</div><div class="stat-lbl">Offices nationwide</div></div>
-            <div><div class="stat-val num" data-count="1700" data-suffix="+">1,700+</div><div class="stat-lbl">Real estate professionals</div></div>
-            <div><div class="stat-val num" data-count="63" data-suffix="M">63M</div><div class="stat-lbl">SF developed or acquired</div></div>
-            <div><div class="stat-val num" data-count="445" data-suffix="M+">445M+</div><div class="stat-lbl">SF leased &amp; managed</div></div>
-            <div><div class="stat-val num" data-count="8.9" data-decimals="1" data-prefix="$" data-suffix="B">$8.9B</div><div class="stat-lbl">Annual transactions</div></div>
-          </div>
+      <div class="partner-main">
+        <div>
+          <h2 class="title rise">Your Real Estate <span class="lime">Partner</span></h2>
+          <p class="tag rise" style="--d:1">Relationships first, then real estate.</p>
         </div>
-        <div class="map-wrap">
-          <div class="map-tools">
-            <button class="chip" type="button" data-layer="stream" aria-pressed="true"><i></i>Stream offices</button>
-            <button class="chip mar" type="button" data-layer="mariner" aria-pressed="true"><i></i>Mariner today</button>
-          </div>
-          <svg class="usmap" id="usMap" viewBox="0 0 975 610" role="img" aria-label="Map of Stream's 20 offices and Mariner's Coppell and Clinton locations"></svg>
-          <div class="map-tip" id="mapTip" hidden></div>
+        <div class="map-wrap rise" style="--d:2">
+          <svg class="usmap" id="partnerMap" viewBox="0 0 975 610" role="img" aria-label="Map of Stream Realty Partners' 21 offices"></svg>
+          <div class="map-tip" hidden></div>
         </div>
-        <div class="diff">
-          <article><h3>Privately held</h3><p>Our fiduciary duty is to our clients, not Wall Street.</p></article>
-          <article><h3><b>$5.0B</b> investment fund</h3><p>We can place capital on behalf of clients and negotiate from an owner's perspective.</p></article>
-          <article><h3>Development arm</h3><p>Unlocks hidden opportunities in the market.</p></article>
+        <div class="stats rise" style="--d:3">
+          <div><div class="stat-val num" data-count="30">30</div><div class="stat-lbl">Years in<br>Operation</div></div>
+          <div><div class="stat-val num" data-count="21">21</div><div class="stat-lbl">Offices<br>Nationwide</div></div>
+          <div><div class="stat-val num" data-count="1550" data-suffix="+">1,550+</div><div class="stat-lbl">Real Estate<br>Professionals</div></div>
+          <div><div class="stat-val num" data-count="62.9" data-decimals="1" data-suffix="M SF">62.9<small>M SF</small></div><div class="stat-lbl">Developed<br>or Acquired</div></div>
+          <div><div class="stat-val num" data-count="466" data-suffix="M+ SF">466<small>M+ SF</small></div><div class="stat-lbl">Leased<br>&amp; Managed</div></div>
+          <div><div class="stat-val num" data-count="11.5" data-decimals="1" data-prefix="$" data-suffix="B">$11.5<small>B</small></div><div class="stat-lbl">Annual<br>Transactions</div></div>
         </div>
       </div>
+      <aside class="platform">
+        <h3 class="rise" style="--d:1">Our Core Values</h3>
+        <ul class="values rise" style="--d:2">
+          <li class="value"><div class="ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 21c-2.5-2-4-4.6-4-7.6a9 9 0 0 1 18 0c0 3-1.5 5.6-4 7.6v3H11z"/><path d="M12 28h8"/><path d="M16 9v6l3 3"/></svg></div><span>Smart</span></li>
+          <li class="value"><div class="ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l11 4v8c0 7-4.6 11.6-11 14C9.6 26.6 5 22 5 15V7z"/><path d="M11 16l4 4 7-8"/></svg></div><span>Honest</span></li>
+          <li class="value"><div class="ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 14v14H4V14z"/><path d="M10 15l5-10c2 0 3.5 1.5 3 4l-1 4h8c1.7 0 3 1.6 2.6 3.3l-2 9A3 3 0 0 1 22.7 28H10"/></svg></div><span>Nice</span></li>
+          <li class="value"><div class="ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 27S4 19.6 4 11.8A6.8 6.8 0 0 1 16 7.6a6.8 6.8 0 0 1 12 4.2C28 19.6 16 27 16 27z"/></svg></div><span>Passionate</span></li>
+        </ul>
+        <hr class="rise" style="--d:3">
+        <h3 class="rise" style="--d:3">Full-Service Platform</h3>
+        <ul class="services rise" style="--d:4">
+          <li class="lead-svc">Tenant Representation</li>
+          <li>National Program Management</li>
+          <li>Investment Management</li>
+          <li>Development</li>
+          <li>Landlord Representation</li>
+          <li>Property Management</li>
+          <li>Construction &amp; Project Management</li>
+          <li>Investment Sales</li>
+          <li>Location &amp; Labor Intelligence</li>
+          <li>Marketing &amp; Research</li>
+          <li>Workplace Strategy</li>
+        </ul>
+      </aside>
     </section>
 
-    <!-- 4. Locations -->
-    <section class="slide" id="locations" data-name="Locations" aria-label="Locations">
-      <header class="slide-head">
-        <img class="mariner-mark" src="assets/mariner-logo.png" alt="Mariner">
+    <!-- 4. Understanding your footprint -->
+    <section class="slide navy" id="footprint" data-name="Footprint" aria-label="Understanding your footprint">
+      <header class="slide-head" style="right:550px">
+        <img class="mariner-mark" src="assets/mariner-logo.svg" alt="Mariner">
         <img class="stream-mark" src="assets/stream-logo-navy.png" alt="Stream Realty Partners">
       </header>
-      <div class="loc-head">
-        <div style="display:grid;gap:12px">
-          <span class="eyebrow">Site options</span>
-          <h2 class="title">Locations</h2>
-          <p>Properties the team has identified for Mariner.</p>
+      <div class="fp-main">
+        <div class="fp-headrow">
+          <div style="display:grid;gap:14px">
+            <span class="overline rise">The Mariner network</span>
+            <h2 class="title rise" style="--d:1">Understanding <span class="lime">Your Footprint</span></h2>
+          </div>
+          <div class="chips rise" style="--d:2" id="fpChips">
+            <button class="chip" type="button" data-layer="stream" aria-pressed="false"><i></i>Stream offices</button>
+          </div>
         </div>
-        <span class="draft" id="draftTag">Draft · sites to come from the team</span>
+        <div class="map-wrap rise" style="--d:2">
+          <svg class="usmap" id="footprintMap" viewBox="0 0 975 610" role="img" aria-label="Map of Mariner's locations"></svg>
+          <div class="map-tip" hidden></div>
+        </div>
       </div>
-      <div class="loc-grid" id="locGrid"></div>
+      <aside class="fp-panel">
+        <div class="fp-photo" aria-hidden="true"></div>
+        <div class="fp-stats rise" style="--d:2">
+          <div><div class="stat-val num" id="fpSites">—</div><div class="stat-lbl">Sites</div></div>
+          <div><div class="stat-val num" id="fpSf">—</div><div class="stat-lbl">Total SF</div></div>
+          <div><div class="stat-val num" id="fpStates">—</div><div class="stat-lbl">States</div></div>
+        </div>
+        <div style="display:grid;align-content:start;min-height:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 40px 0;gap:12px">
+            <span class="label">Current locations</span>
+            <span class="draft" id="fpDraft">Draft · team to provide</span>
+          </div>
+          <ul class="site-list rise" style="--d:3" id="siteList"></ul>
+        </div>
+      </aside>
     </section>
 
-    <!-- 5. Close -->
+    <!-- 5. Thank you -->
     <section class="slide" id="close" data-name="Thank you" aria-label="Thank you">
-      <header class="slide-head">
-        <img class="mariner-mark" src="assets/mariner-logo.png" alt="Mariner">
+      <header class="slide-head" style="justify-content:flex-end">
         <img class="stream-mark" src="assets/stream-logo-navy.png" alt="Stream Realty Partners">
       </header>
+      <img class="close-icon rise" src="assets/mariner-icon.svg" alt="">
       <div class="close-copy">
-        <span class="eyebrow">Mariner Logistics × Stream Realty Partners</span>
-        <h2>Thank you<span class="lime">.</span></h2>
-        <p>We look forward to working with <b>Mariner</b>.</p>
+        <h2 class="rise" style="--d:1">Thank you<span class="lime">.</span></h2>
+        <p class="rise" style="--d:2">We look forward to working with <b>Mariner</b>.</p>
       </div>
-      <img class="close-icon" src="assets/mariner-icon.svg" alt="">
-      <div class="contacts">
-        <div class="contact"><img src="assets/adrian-boone.jpg" alt=""><div><h3>Adrian Boone</h3><p>Vice President</p></div></div>
-        <div class="contact"><img src="assets/jordan-decker.jpg" alt=""><div><h3>Jordan Decker</h3><p>Managing Director</p></div></div>
-        <div class="contact"><img src="assets/phil-geiger.jpg" alt=""><div><h3>Phil Geiger</h3><p>Managing Director</p></div></div>
+      <div class="contacts rise" style="--d:3" id="contacts"></div>
+      <div class="close-foot">
+        <span class="label">Mariner Logistics × Stream Realty Partners — October 2026</span>
+        <img class="mariner-mark" src="assets/mariner-logo.svg" alt="Mariner">
       </div>
     </section>
 
@@ -428,147 +476,255 @@ button { font: inherit; color: inherit; }
 
 <script src="assets/us-map.js"></script>
 <script>
-/* ---- Locations: the team fills these in. Leave a value as null to show "To come". ---- */
-const LOCATIONS = [
-  { code: "Option A", name: null, address: null, submarket: null, size: null, clearHeight: null, docks: null, rate: null, available: null },
-  { code: "Option B", name: null, address: null, submarket: null, size: null, clearHeight: null, docks: null, rate: null, available: null },
-  { code: "Option C", name: null, address: null, submarket: null, size: null, clearHeight: null, docks: null, rate: null, available: null },
+/* ---- Team: used on the team slide and the thank-you slide ---- */
+const TEAM = [
+  { name: "Adrian Boone",  role: "Vice President",    phone: "510.230.7173", email: "adrian.boone@streamrealty.com",  photo: "assets/adrian-boone.jpg" },
+  { name: "Jordan Decker", role: "Managing Director", phone: "317.250.0733", email: "jordan.decker@streamrealty.com", photo: "assets/jordan-decker.jpg" },
+  { name: "Phil Geiger",   role: "Managing Director", phone: "312.576.6713", email: "phil.geiger@streamrealty.com",   photo: "assets/phil-geiger.jpg" },
 ];
-const LOC_FIELDS = [
-  ["address", "Address"], ["submarket", "Submarket"], ["size", "Size (SF)"],
-  ["clearHeight", "Clear height"], ["docks", "Dock doors"], ["rate", "Asking rate"], ["available", "Available"],
+
+/* ---- Footprint: Mariner's current locations, to come from the team.
+   One object per site; lat/lon place the pin, sf feeds the totals. Example:
+   { name: "Headquarters", type: "Office", city: "Coppell", state: "TX", lat: 32.9546, lon: -97.0150, sf: 25000 },
+   Types become filter chips automatically. ---- */
+const FOOTPRINT = [
 ];
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const narrow = matchMedia("(max-width: 820px)");
 const NS = "http://www.w3.org/2000/svg";
-const el = (tag, attrs = {}, parent) => {
+const svgEl = (tag, attrs = {}, parent) => {
   const n = document.createElementNS(NS, tag);
   for (const k in attrs) n.setAttribute(k, attrs[k]);
   if (parent) parent.appendChild(n);
   return n;
 };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const telHref = p => "tel:+1" + p.replace(/\D/g, "");
+
+/* Albers USA (lower 48), matching the projection the state outlines were drawn with */
+function project(lon, lat) {
+  const R = Math.PI / 180, p0 = 29.5 * R, p1 = 45.5 * R;
+  const n = (Math.sin(p0) + Math.sin(p1)) / 2, C = Math.cos(p0) ** 2 + 2 * n * Math.sin(p0);
+  const raw = (l, p) => { const r = Math.sqrt(C - 2 * n * Math.sin(p)) / n; return [r * Math.sin(l * n), Math.sqrt(C) / n - r * Math.cos(l * n)]; };
+  const c = raw(-0.6 * R, 38.7 * R), [x, y] = raw((lon + 96) * R, lat * R);
+  return [487.5 + 1300 * (x - c[0]), 305 - 1300 * (y - c[1])];
+}
 
 /* ---- maps ---- */
 const M = window.US_MAP;
-/* Cover: halftone field of lime squares, echoing Mariner's brand splash. Follows the pointer gently. */
-(function halftone() {
-  const cv = document.getElementById("halftone");
-  const ctx = cv.getContext("2d");
-  const W = 1600, H = 900, STEP = 32;
-  let fx = 1200, fy = 560, tx = fx, ty = fy, t0 = performance.now();
-  const lime = getComputedStyle(document.documentElement).getPropertyValue("--lime").trim() || "#D3FF28";
-  function draw(now) {
-    fx += (tx - fx) * .06; fy += (ty - fy) * .06;
-    const pulse = reduceMotion ? 1 : 1 + .08 * Math.sin((now - t0) / 700);
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = lime;
-    for (let y = STEP / 2; y < H; y += STEP) for (let x = STEP / 2; x < W; x += STEP) {
-      // inverted-triangle falloff below and around the focus, like the splash
-      const dx = (x - fx) / 330, dy = (y - fy) / 240;
-      const d = Math.abs(dx) * (1 + Math.max(0, dy) * .9) + Math.abs(dy) * .9;
-      const s = Math.max(0, 1 - d) * 18 * pulse;
-      if (s < 2.5 || x < 860) continue;
-      ctx.globalAlpha = Math.min(1, .35 + s / 18);
-      ctx.fillRect(Math.round(x - s / 2), Math.round(y - s / 2), Math.round(s), Math.round(s));
-    }
-    ctx.globalAlpha = 1;
-    if (!reduceMotion && document.getElementById("cover").classList.contains("is-active")) requestAnimationFrame(draw);
-    else running = false;
-  }
-  let running = false;
-  window.startHalftone = () => { if (!running) { running = true; requestAnimationFrame(draw); } };
-  cv.parentElement.addEventListener("pointermove", e => {
-    const r = cv.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width * W, py = (e.clientY - r.top) / r.height * H;
-    tx = 1200 + (px - 1200) * .25; ty = 560 + (py - 560) * .25;
-  });
-  window.startHalftone();
-})();
-
-(function officeMap() {
-  const svg = document.getElementById("usMap");
-  const tip = document.getElementById("mapTip");
-  const hl = new Set(M.hl);
-  M.states.forEach(s => el("path", { d: s.d, class: "st" + (hl.has(s.id) ? " hl" : "") }, svg));
-  const stream = el("g", { class: "layer", "data-layer": "stream" }, svg);
-  const mariner = el("g", { class: "layer", "data-layer": "mariner" }, svg);
-  const show = (evt, label) => {
-    const box = svg.getBoundingClientRect(), wrap = svg.parentElement.getBoundingClientRect();
-    const scale = box.width / 975;
-    const t = evt.currentTarget;
-    const cx = +t.getAttribute("cx"), cy = +t.getAttribute("cy");
-    // viewBox is letterboxed inside the svg box; account for vertical offset
-    const s = Math.min(box.width / 975, box.height / 610);
-    const ox = (box.width - 975 * s) / 2, oy = (box.height - 610 * s) / 2;
-    const stageScale = box.width / svg.clientWidth || 1;
-    tip.style.left = ((box.left - wrap.left) + ox + cx * s) / stageScale + "px";
-    tip.style.top = ((box.top - wrap.top) + oy + cy * s) / stageScale + "px";
-    tip.textContent = label;
-    tip.hidden = false;
+function baseMap(svg, hatch) {
+  const defs = svgEl("defs", {}, svg);
+  const pat = svgEl("pattern", { id: "hatch", width: 6, height: 6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, defs);
+  svgEl("rect", { width: 6, height: 6, fill: "#22385A" }, pat);
+  svgEl("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: "#D3FF28", "stroke-opacity": .35, "stroke-width": 1.4 }, pat);
+  const hl = new Set(hatch ? M.hl : []);
+  M.states.forEach(s => svgEl("path", { d: s.d, class: "st" + (hl.has(s.id) ? " hl" : "") }, svg));
+  const tip = svg.parentElement.querySelector(".map-tip");
+  return {
+    show(x, y, html) {
+      // place the tip in the wrapper's own (unscaled) pixels; the svg letterboxes its viewBox
+      // (svg elements have no offsetLeft, so measure on screen and undo the stage scale)
+      const sr = svg.getBoundingClientRect(), wr = svg.parentElement.getBoundingClientRect();
+      const k = sr.width / svg.clientWidth || 1;
+      const w = svg.clientWidth, h = svg.clientHeight, s = Math.min(w / 975, h / 610);
+      tip.style.left = (sr.left - wr.left) / k + (w - 975 * s) / 2 + x * s + "px";
+      tip.style.top = (sr.top - wr.top) / k + (h - 610 * s) / 2 + y * s + "px";
+      tip.innerHTML = html;
+      tip.hidden = false;
+    },
+    hide() { tip.hidden = true; },
   };
-  const hide = () => { tip.hidden = true; };
-  Object.entries(M.pts).forEach(([name, [x, y]]) => {
-    const isM = name === "Coppell, TX" || name === "Clinton, MS";
-    const label = isM ? `Mariner · ${name}` : `Stream · ${name}`;
-    const c = el("circle", { cx: x, cy: y, r: isM ? 9 : 7, class: isM ? "mdot" : "dot", tabindex: 0, "aria-label": label }, isM ? mariner : stream);
-    c.addEventListener("mouseenter", e => show(e, label));
-    c.addEventListener("focus", e => show(e, label));
-    c.addEventListener("mouseleave", hide);
-    c.addEventListener("blur", hide);
+}
+function officeLayer(svg, map, withLabels) {
+  const g = svgEl("g", { class: "layer" }, svg);
+  const dots = M.offices.map(o => {
+    const c = svgEl("circle", { cx: o.x, cy: o.y, r: 6.5, class: "dot", tabindex: 0, "aria-label": `Stream office: ${o.name}` }, g);
+    const on = () => map.show(o.x, o.y, `${esc(o.name)}<small>Stream · ${esc(o.region)}</small>`);
+    c.addEventListener("mouseenter", on); c.addEventListener("focus", on);
+    c.addEventListener("mouseleave", map.hide); c.addEventListener("blur", map.hide);
+    c.dataset.region = o.region;
+    return c;
   });
-  // keep Mariner labels visible so the overlap with Stream's DFW base reads at a glance
-  el("text", { x: 404, y: 420, class: "mlbl" }, mariner).textContent = "COPPELL";
-  el("text", { x: 590, y: 476, class: "mlbl" }, mariner).textContent = "CLINTON";
-  document.querySelectorAll(".chip[data-layer]").forEach(b => b.addEventListener("click", () => {
-    const on = b.getAttribute("aria-pressed") !== "true";
-    b.setAttribute("aria-pressed", on);
-    svg.querySelector(`.layer[data-layer="${b.dataset.layer}"]`).classList.toggle("off", !on);
-  }));
-})();
-
-/* ---- locations ---- */
-(function locations() {
-  const grid = document.getElementById("locGrid");
-  let anyFilled = false;
-  LOCATIONS.forEach(loc => {
-    const filled = LOC_FIELDS.some(([k]) => loc[k] != null) || loc.name != null;
-    anyFilled ||= filled;
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "loc" + (filled ? " filled" : "");
-    b.setAttribute("aria-pressed", "false");
-    const rows = LOC_FIELDS.map(([k, lbl]) =>
-      `<dt>${lbl}</dt><dd class="${loc[k] == null ? "tbd" : ""}">${loc[k] == null ? "To come" : loc[k]}</dd>`).join("");
-    b.innerHTML = `<span class="code">${loc.code}</span><h3>${loc.name ?? "Site to come"}</h3><dl>${rows}</dl>`;
-    b.addEventListener("click", () => {
-      grid.querySelectorAll(".loc").forEach(o => o.setAttribute("aria-pressed", o === b && o.getAttribute("aria-pressed") !== "true"));
+  if (withLabels) {
+    // region labels with leader lines, as on Stream's office map
+    const L = {
+      "Southern California": [40, 420, "start"], "Phoenix": [214, 432, "start"], "Denver": [342, 240, "middle"],
+      "Texas": [392, 570, "middle"], "Chicago": [592, 196, "middle"], "Nashville": [640, 322, "middle"],
+      "Atlanta": [690, 446, "middle"], "Carolinas": [800, 382, "start"], "D.C. | MD | VA": [850, 250, "start"],
+      "Florida": [850, 532, "start"],
+    };
+    Object.entries(L).forEach(([region, [x, y, anchor]]) => {
+      const pts = M.offices.filter(o => o.region === region);
+      const cx = pts.reduce((a, o) => a + o.x, 0) / pts.length, cy = pts.reduce((a, o) => a + o.y, 0) / pts.length;
+      svgEl("line", { x1: cx, y1: cy, x2: anchor === "start" ? x - 4 : x, y2: y + (y > cy ? -12 : 4), class: "lead" }, g);
+      const t = svgEl("text", { x, y, "text-anchor": anchor, class: "rlbl", tabindex: 0 }, g);
+      t.textContent = pts.length > 1 ? `${region} · ${pts.length}` : region;
+      const on = () => {
+        t.classList.add("on");
+        dots.forEach(d => d.classList.toggle("on", d.dataset.region === region));
+        map.show(cx, cy, pts.map(o => esc(o.name)).join(" · ") + `<small>${esc(region)}</small>`);
+      };
+      const off = () => { t.classList.remove("on"); dots.forEach(d => d.classList.remove("on")); map.hide(); };
+      t.addEventListener("mouseenter", on); t.addEventListener("focus", on);
+      t.addEventListener("mouseleave", off); t.addEventListener("blur", off);
     });
-    grid.appendChild(b);
-  });
-  document.getElementById("draftTag").hidden = anyFilled;
+    g.querySelectorAll(".lead").forEach(l => g.insertBefore(l, g.firstChild)); // lines under dots
+  }
+  return g;
+}
+
+/* slide 3: Stream offices */
+(function partnerMap() {
+  const svg = document.getElementById("partnerMap");
+  officeLayer(svg, baseMap(svg, true), true);
 })();
 
-/* team: tap a person to spotlight them */
-document.querySelectorAll(".person").forEach(p => p.addEventListener("click", () => {
-  const on = p.getAttribute("aria-pressed") !== "true";
-  document.querySelectorAll(".person").forEach(o => o.setAttribute("aria-pressed", o === p && on));
-}));
+/* slide 4: Mariner footprint, with Stream offices as an optional overlay */
+(function footprint() {
+  const svg = document.getElementById("footprintMap");
+  const map = baseMap(svg, false);
+  const stream = officeLayer(svg, map, false);
+  stream.classList.add("off");
+  const g = svgEl("g", { class: "layer" }, svg);
+  const list = document.getElementById("siteList");
+  const sites = FOOTPRINT.filter(s => s && s.lat != null && s.lon != null);
+  const items = [];
+  const select = (i, on) => {
+    items.forEach((it, k) => { it.row.classList.toggle("on", on && k === i); it.sq.classList.toggle("on", on && k === i); });
+    if (!on) return map.hide();
+    const { s, x, y } = items[i];
+    map.show(x, y - 4, `${esc(s.name || s.city)}<small>${esc([s.type, [s.city, s.state].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>`);
+  };
+  sites.forEach((s, i) => {
+    const [x, y] = project(+s.lon, +s.lat);
+    svgEl("rect", { x: x - 7, y: y - 7, width: 14, height: 14, class: "ping" }, g);
+    const sq = svgEl("rect", { x: x - 7, y: y - 7, width: 14, height: 14, class: "msq", tabindex: 0, "aria-label": `Mariner: ${s.name || s.city}` }, g);
+    const li = document.createElement("li");
+    const row = document.createElement("button");
+    row.type = "button"; row.className = "site"; row.dataset.type = s.type || "";
+    row.innerHTML = `<i></i><b>${esc(s.name || s.city || "Site")}</b><small>${esc([s.city, s.state].filter(Boolean).join(", "))}</small><em>${s.sf ? esc(Number(s.sf).toLocaleString("en-US")) + " SF" : esc(s.type || "")}</em>`;
+    li.appendChild(row); list.appendChild(li);
+    items.push({ s, x, y, sq, row });
+    [sq, row].forEach(n => {
+      n.addEventListener("mouseenter", () => select(i, true)); n.addEventListener("focus", () => select(i, true));
+      n.addEventListener("mouseleave", () => select(i, false)); n.addEventListener("blur", () => select(i, false));
+    });
+  });
+  if (!sites.length) {
+    for (let i = 0; i < 3; i++) list.insertAdjacentHTML("beforeend", `<li><div class="site empty"><i></i><b>Site to come</b><small>Location details from the team</small></div></li>`);
+  } else {
+    document.getElementById("fpDraft").hidden = true;
+    const totalSf = sites.reduce((a, s) => a + (+s.sf || 0), 0);
+    const fill = (id, v, suffix = "", dec = 0) => { const n = document.getElementById(id); n.dataset.count = v; n.dataset.suffix = suffix; n.dataset.decimals = dec; };
+    fill("fpSites", sites.length);
+    if (totalSf >= 1e6) fill("fpSf", +(totalSf / 1e6).toFixed(1), "M", 1);
+    else if (totalSf) fill("fpSf", Math.round(totalSf / 1e3), "K");
+    fill("fpStates", new Set(sites.map(s => s.state).filter(Boolean)).size);
+    // one filter chip per site type
+    const types = [...new Set(sites.map(s => s.type).filter(Boolean))];
+    const chips = document.getElementById("fpChips");
+    if (types.length > 1) types.forEach(t => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "chip sq"; b.setAttribute("aria-pressed", "true");
+      b.innerHTML = `<i></i>${esc(t)}`;
+      b.addEventListener("click", () => {
+        const on = b.getAttribute("aria-pressed") !== "true";
+        b.setAttribute("aria-pressed", on);
+        items.forEach(it => { if (it.s.type === t) { it.row.parentElement.hidden = !on; it.sq.style.display = on ? "" : "none"; it.sq.previousSibling.style.display = on ? "" : "none"; } });
+      });
+      chips.insertBefore(b, chips.firstChild);
+    });
+  }
+  document.querySelector('#fpChips [data-layer="stream"]').addEventListener("click", e => {
+    const b = e.currentTarget, on = b.getAttribute("aria-pressed") !== "true";
+    b.setAttribute("aria-pressed", on);
+    stream.classList.toggle("off", !on);
+  });
+})();
+
+/* ---- team cards: tap a photo to open contact details ---- */
+(function team() {
+  const people = document.getElementById("people");
+  TEAM.forEach((p, i) => {
+    const card = document.createElement("div");
+    card.className = "person rise";
+    card.style.setProperty("--d", i + 2);
+    card.innerHTML = `
+      <button class="ph" type="button" aria-expanded="false" aria-label="Show contact details for ${esc(p.name)}">
+        <img src="${esc(p.photo)}" alt="${esc(p.name)}">
+        <span class="hint">Contact</span>
+      </button>
+      <div class="drawer" inert>
+        <a href="${telHref(p.phone)}">${esc(p.phone)} <span>›</span></a>
+        <a href="mailto:${esc(p.email)}">Email ${esc(p.name.split(" ")[0])} <span>›</span></a>
+      </div>
+      <div><h3>${esc(p.name)}</h3><p>${esc(p.role)}</p></div>`;
+    // the drawer sits over the photo; keep it inside the photo box
+    card.querySelector(".ph").appendChild(card.querySelector(".drawer"));
+    people.appendChild(card);
+  });
+  people.addEventListener("click", e => {
+    const ph = e.target.closest(".ph");
+    if (!ph || e.target.closest(".drawer")) return;
+    const card = ph.parentElement, open = !card.classList.contains("open");
+    people.querySelectorAll(".person").forEach(c => {
+      const on = c === card && open;
+      c.classList.toggle("open", on);
+      c.querySelector(".ph").setAttribute("aria-expanded", on);
+      c.querySelector(".drawer").inert = !on;
+    });
+  });
+})();
+
+/* ---- thank-you contacts, with a save-contact (vCard) link ---- */
+(function contacts() {
+  const box = document.getElementById("contacts");
+  TEAM.forEach(p => {
+    const d = document.createElement("div");
+    d.className = "contact";
+    d.innerHTML = `<h3>${esc(p.name)}</h3><p>${esc(p.role)}</p>
+      <a class="clink" href="${telHref(p.phone)}">Cell: ${esc(p.phone)}</a>
+      <a class="clink" href="mailto:${esc(p.email)}">${esc(p.email)}</a>
+      <button class="clink vcf" type="button">Save contact</button>`;
+    d.querySelector(".vcf").addEventListener("click", () => {
+      const [first, ...rest] = p.name.split(" ");
+      const vcf = ["BEGIN:VCARD", "VERSION:3.0", `N:${rest.join(" ")};${first};;;`, `FN:${p.name}`, "ORG:Stream Realty Partners",
+        `TITLE:${p.role}`, `TEL;TYPE=CELL:+1${p.phone.replace(/\D/g, "")}`, `EMAIL;TYPE=WORK:${p.email}`, "END:VCARD"].join("\r\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([vcf], { type: "text/vcard" }));
+      a.download = p.name.replace(/\s+/g, "-").toLowerCase() + ".vcf";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+    box.appendChild(d);
+  });
+})();
+
+/* ---- cover: the globe drifts with the pointer ---- */
+document.getElementById("cover").addEventListener("pointermove", e => {
+  if (reduceMotion || narrow.matches) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  const nx = (e.clientX - r.left) / r.width - .5, ny = (e.clientY - r.top) / r.height - .5;
+  const p = document.getElementById("coverPhoto");
+  p.style.setProperty("--px", (-nx * 28).toFixed(1) + "px");
+  p.style.setProperty("--py", (-ny * 14).toFixed(1) + "px");
+});
 
 /* ---- count-up ---- */
 function fmt(n, d) { return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
 function render(node, v) {
   const d = +(node.dataset.decimals || 0), pre = node.dataset.prefix || "", suf = node.dataset.suffix || "";
-  const big = node.classList.contains("result-val");
-  node.innerHTML = pre + fmt(v, d) + (suf ? (big ? `<small>${suf}</small>` : suf) : "");
+  const small = suf && suf !== "+";
+  node.innerHTML = pre + fmt(v, d) + (small ? `<small>${suf}</small>` : suf);
 }
 function countUp(slide) {
   slide.querySelectorAll("[data-count]").forEach(node => {
     const target = +node.dataset.count;
     if (reduceMotion || narrow.matches) { render(node, target); return; }
-    const start = performance.now(), dur = 1300;
+    const start = performance.now() + 250, dur = 1400;
     const tick = now => {
-      const t = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - t, 3);
+      const t = Math.max(0, Math.min(1, (now - start) / dur)), e = 1 - Math.pow(1 - t, 3);
       render(node, target * e);
       if (t < 1) requestAnimationFrame(tick);
     };
@@ -596,16 +752,20 @@ let cur = -1;
 function go(i) {
   i = Math.max(0, Math.min(slides.length - 1, i));
   if (i === cur) return;
-  slides.forEach((s, k) => { s.classList.toggle("is-active", k === i); s.setAttribute("aria-hidden", k !== i && !narrow.matches); });
+  slides.forEach((s, k) => {
+    s.classList.toggle("is-active", k === i);
+    const hide = k !== i && !narrow.matches;
+    s.setAttribute("aria-hidden", hide);
+    s.inert = hide;
+  });
   stops.forEach((b, k) => { b.classList.toggle("passed", k <= i); k === i ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current"); });
   const first = stops[0].getBoundingClientRect(), last = stops[stops.length - 1].getBoundingClientRect(), now = stops[i].getBoundingClientRect();
-  run.style.width = (last.left - first.left) ? ((now.left - first.left) / (last.left - first.left)) * (run.parentElement.clientWidth - 28) + "px" : "0px";
+  run.style.width = (last.left - first.left) ? ((now.left - first.left) / (last.left - first.left)) * (run.parentElement.clientWidth - 32) + "px" : "0px";
   document.getElementById("counter").textContent = String(i + 1).padStart(2, "0") + " / " + String(slides.length).padStart(2, "0");
   document.getElementById("prev").disabled = i === 0;
   document.getElementById("next").disabled = i === slides.length - 1;
   cur = i;
   countUp(slides[i]);
-  if (slides[i].id === "cover" && window.startHalftone) window.startHalftone();
   try { history.replaceState(null, "", "#" + slides[i].id); } catch (e) {}
 }
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(+b.dataset.go)));
@@ -617,6 +777,7 @@ document.addEventListener("keydown", e => {
   else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(cur - 1); }
   else if (e.key === "Home") go(0);
   else if (e.key === "End") go(slides.length - 1);
+  else if (e.key === "f" || e.key === "F") toggleFs();
 });
 /* swipe on touch screens wide enough for slide mode */
 let tx = null;
@@ -627,24 +788,26 @@ document.getElementById("viewport").addEventListener("touchend", e => {
   if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1));
   tx = null;
 });
-document.getElementById("fs").addEventListener("click", () => {
+function toggleFs() {
   try {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen().catch(() => {});
   } catch (e) {}
-});
+}
+document.getElementById("fs").addEventListener("click", toggleFs);
 
 function fit() {
   const vp = document.getElementById("viewport");
-  const s = Math.min(vp.clientWidth / 1600, vp.clientHeight / 900) * 0.96;
+  const s = Math.min(vp.clientWidth / 1600, vp.clientHeight / 900) * 0.97;
   document.getElementById("stage").style.setProperty("--s", s);
   if (cur >= 0) { const c = cur; cur = -1; go(c); }
 }
 addEventListener("resize", fit);
 narrow.addEventListener?.("change", fit);
-const startId = location.hash.slice(1);
+const fromHash = () => slides.findIndex(s => s.id === location.hash.slice(1));
+addEventListener("hashchange", () => { const i = fromHash(); if (i >= 0) go(i); });
 fit();
-go(Math.max(0, slides.findIndex(s => s.id === startId)));
+go(Math.max(0, fromHash()));
 </script>
 </body>
 </html>
