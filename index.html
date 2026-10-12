@@ -123,9 +123,10 @@ a { color: inherit; }
 .partner-main { position: absolute; left: 80px; top: 112px; bottom: 44px; width: 990px; display: grid; grid-template-rows: auto 1fr auto; gap: 8px; }
 .partner-main .tag { font-size: 26px; font-weight: 300; color: var(--text); margin-top: 8px; }
 .map-wrap { position: relative; min-height: 0; }
+.map-wrap.rise { transform: none; }  /* fade only: moving a large SVG makes it re-rasterize and flicker */
 .usmap { width: 100%; height: 100%; display: block; }
 .usmap .st { fill: var(--navy-3); stroke: var(--black); stroke-width: .8; }
-.usmap .st.hl { fill: url(#hatch); }
+.usmap .st.hl { fill: #2C4A73; }  /* states with Stream offices: a lighter navy */
 .usmap .dot { fill: var(--white); stroke: var(--black); stroke-width: 2; cursor: pointer; transition: fill .2s; }
 .usmap .dot:hover, .usmap .dot:focus, .usmap .dot.on { fill: var(--lime); outline: none; }
 .usmap .rlbl { font-family: var(--tech); font-size: 14px; font-weight: 500; letter-spacing: .1em; fill: var(--grey); text-transform: uppercase; cursor: pointer; transition: fill .2s; }
@@ -139,11 +140,12 @@ a { color: inherit; }
 @keyframes ping { 0% { transform: scale(1); opacity: .9 } 100% { transform: scale(3.4); opacity: 0 } }
 .map-tip { position: absolute; z-index: 3; pointer-events: none; background: var(--lime); color: var(--black); font-family: var(--tech); font-size: 14px; font-weight: 500; letter-spacing: .04em; padding: 6px 10px; white-space: nowrap; transform: translate(-50%, calc(-100% - 14px)); }
 .map-tip small { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .7; }
-.stats { display: grid; grid-template-columns: repeat(6, auto); justify-content: space-between; border-top: 1px solid var(--lime-line); padding-top: 22px; }
-.stats > div { padding: 0 22px; border-left: 1px solid var(--rule); text-align: center; }
+.stats { display: grid; grid-template-columns: repeat(6, auto); justify-content: space-between; border-top: 1px solid var(--lime-line); padding-top: 22px; }  /* each number reserves its final width (countUp), so the row never shifts */
+.stats > div { padding: 0 16px; border-left: 1px solid var(--rule); text-align: center; }
+.stats .stat-val { font-size: 44px; }
 .stats > div:first-child { border-left: 0; padding-left: 0; }
 .stats > div:last-child { padding-right: 0; }
-.stat-val { font-family: var(--display); font-weight: 400; font-size: 50px; line-height: 1; color: var(--lime); white-space: nowrap; }
+.stat-val { font-family: var(--display); font-weight: 400; font-size: 50px; line-height: 1; color: var(--lime); white-space: nowrap; display: inline-block; text-align: right; }
 .stat-val small { font-size: .55em; margin-left: 3px; }
 .stat-lbl { font-size: 16px; color: var(--grey); margin-top: 8px; line-height: 1.25; }
 .platform { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; padding: 112px 60px 44px 56px; display: grid; grid-template-rows: auto auto auto auto 1fr; gap: 22px; border-left: 1px solid var(--lime-line);
@@ -506,10 +508,6 @@ function project(lon, lat) {
 /* ---- maps ---- */
 const M = window.US_MAP;
 function baseMap(svg, hatch) {
-  const defs = svgEl("defs", {}, svg);
-  const pat = svgEl("pattern", { id: "hatch", width: 6, height: 6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, defs);
-  svgEl("rect", { width: 6, height: 6, fill: "#22385A" }, pat);
-  svgEl("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: "#D3FF28", "stroke-opacity": .35, "stroke-width": 1.4 }, pat);
   const hl = new Set(hatch ? M.hl : []);
   M.states.forEach(s => svgEl("path", { d: s.d, class: "st" + (hl.has(s.id) ? " hl" : "") }, svg));
   const tip = svg.parentElement.querySelector(".map-tip");
@@ -520,10 +518,12 @@ function baseMap(svg, hatch) {
       const sr = svg.getBoundingClientRect(), wr = svg.parentElement.getBoundingClientRect();
       const k = sr.width / svg.clientWidth || 1;
       const w = svg.clientWidth, h = svg.clientHeight, s = Math.min(w / 975, h / 610);
-      tip.style.left = (sr.left - wr.left) / k + (w - 975 * s) / 2 + x * s + "px";
-      tip.style.top = (sr.top - wr.top) / k + (h - 610 * s) / 2 + y * s + "px";
       tip.innerHTML = html;
       tip.hidden = false;
+      const half = tip.offsetWidth / 2, wrapW = svg.parentElement.clientWidth;
+      const left = (sr.left - wr.left) / k + (w - 975 * s) / 2 + x * s;
+      tip.style.left = Math.max(half, Math.min(wrapW - half, left)) + "px";
+      tip.style.top = (sr.top - wr.top) / k + (h - 610 * s) / 2 + y * s + "px";
     },
     hide() { tip.hidden = true; },
   };
@@ -713,7 +713,15 @@ function render(node, v) {
 function countUp(slide) {
   slide.querySelectorAll("[data-count]").forEach(node => {
     const target = +node.dataset.count;
-    if (reduceMotion || narrow.matches) { render(node, target); return; }
+    // hold each number's box at its final width so the digits count up in place
+    node.style.minWidth = "";
+    render(node, target);
+    if (narrow.matches) return;
+    // size for the widest digits any intermediate value could use, not just the final ones
+    const finalHtml = node.innerHTML;
+    const widest = Math.max(...["0", "2", "4", "5", "8"].map(dg => { node.innerHTML = finalHtml.replace(/\d/g, dg); return node.offsetWidth; }), (node.innerHTML = finalHtml, node.offsetWidth));
+    node.style.minWidth = Math.ceil(widest) + "px";
+    if (reduceMotion) return;
     const start = performance.now() + 250, dur = 1400;
     const tick = now => {
       const t = Math.max(0, Math.min(1, (now - start) / dur)), e = 1 - Math.pow(1 - t, 3);
