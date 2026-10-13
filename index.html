@@ -64,9 +64,9 @@ a { color: inherit; }
 .rule-l { border-left: 3px solid var(--lime); padding-left: 26px; }
 
 /* slide chrome: Mariner left, Stream right */
-.slide-head { position: absolute; z-index: 2; left: 80px; right: 80px; top: 44px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
-.mariner-mark { height: 22px; width: auto; }
-.stream-mark { height: 28px; width: auto; filter: brightness(0) invert(1); opacity: .92; }
+.slide-head { position: absolute; z-index: 2; left: 80px; right: 80px; top: 38px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.mariner-mark { height: 36px; width: auto; }
+.stream-mark { height: 42px; width: auto; filter: brightness(0) invert(1); opacity: .95; }
 
 .btn { display: inline-flex; align-items: center; gap: 12px; background: var(--lime); color: var(--black); border: 0; padding: 14px 24px; font-family: var(--tech); font-weight: 500; font-size: 18px; letter-spacing: .02em; cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
 .btn:hover { background: var(--white); }
@@ -173,11 +173,12 @@ a { color: inherit; }
 .chip[aria-pressed="false"] { opacity: .5; }
 .chip:hover { border-color: var(--lime); }
 .draft { font-family: var(--tech); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); border: 1.5px dashed var(--lime); padding: 7px 12px; }
-.fp-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; display: grid; grid-template-rows: 250px auto 1fr; border-left: 1px solid var(--lime-line); background: rgba(0,10,40,.55); }
-.fp-photo { background: linear-gradient(180deg, rgba(13,26,46,0) 50%, var(--navy)), url("assets/photos/truck-wireframe.jpg") 45% 55% / cover; border-bottom: 1px solid var(--lime-line); }
-.fp-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 26px 24px 20px; border-bottom: 1px solid var(--lime-line); }  /* three equal, centered columns */
+.fp-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; display: grid; grid-template-rows: 112px 190px auto 1fr; border-left: 1px solid var(--lime-line); background: rgba(0,10,40,.55); }
+.fp-photo { grid-row: 2; background: linear-gradient(180deg, rgba(13,26,46,0) 60%, var(--navy)), url("assets/photos/truck-wireframe.jpg") 50% 55% / cover; border-top: 1px solid var(--lime-line); border-bottom: 1px solid var(--lime-line); }  /* below the logo strip, so the Stream logo sits on navy */
+.fp-stats { grid-row: 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 26px 24px 20px; border-bottom: 1px solid var(--lime-line); }  /* three equal, centered columns */
 .fp-stats > div { border-left: 1px solid var(--rule); text-align: center; }
 .fp-stats > div:first-child { border-left: 0; }
+.fp-panel > :last-child { grid-row: 4; }
 .fp-stats .stat-val { font-size: 44px; }
 .fp-stats .stat-lbl { font-size: 14px; }
 .site-list { list-style: none; padding: 14px 40px 28px; display: grid; align-content: start; gap: 8px; overflow: auto; }
@@ -271,8 +272,8 @@ a { color: inherit; }
   .slide > * { position: static !important; width: auto !important; }
   .rise { opacity: 1; transform: none; }
   .slide-head { order: -1; }
-  .mariner-mark { height: 16px; }
-  .stream-mark { height: 22px; }
+  .mariner-mark { height: 24px; }
+  .stream-mark { height: 30px; }
   .nav { display: none; }
   .ambient { display: none; }
   .title { font-size: 42px; }
@@ -310,7 +311,7 @@ a { color: inherit; }
 
   .fp-headrow { flex-direction: column; align-items: start; }
   .chips { justify-content: start; }
-  .fp-panel { grid-template-rows: 160px auto auto; padding: 0; }
+  .fp-panel { grid-template-rows: 0 160px auto auto; padding: 0; }
   .fp-stats { padding: 20px 16px; }
   .site-list { padding: 16px; }
 
