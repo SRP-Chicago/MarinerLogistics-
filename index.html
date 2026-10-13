@@ -175,9 +175,9 @@ a { color: inherit; }
 .draft { font-family: var(--tech); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); border: 1.5px dashed var(--lime); padding: 7px 12px; }
 .fp-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; display: grid; grid-template-rows: 250px auto 1fr; border-left: 1px solid var(--lime-line); background: rgba(0,10,40,.55); }
 .fp-photo { background: linear-gradient(180deg, rgba(13,26,46,0) 50%, var(--navy)), url("assets/photos/truck-wireframe.jpg") 45% 55% / cover; border-bottom: 1px solid var(--lime-line); }
-.fp-stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 26px 40px 20px; gap: 0; border-bottom: 1px solid var(--lime-line); }
-.fp-stats > div { border-left: 1px solid var(--rule); padding-left: 18px; }
-.fp-stats > div:first-child { border-left: 0; padding-left: 0; }
+.fp-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 26px 24px 20px; border-bottom: 1px solid var(--lime-line); }  /* three equal, centered columns */
+.fp-stats > div { border-left: 1px solid var(--rule); text-align: center; }
+.fp-stats > div:first-child { border-left: 0; }
 .fp-stats .stat-val { font-size: 44px; }
 .fp-stats .stat-lbl { font-size: 14px; }
 .site-list { list-style: none; padding: 14px 40px 28px; display: grid; align-content: start; gap: 8px; overflow: auto; }
