@@ -11,6 +11,7 @@ Interactive pitch deck from the Stream Realty Partners Chicago Tenant Rep team f
   - On the team slide, click a photo to open that person's phone and email.
   - The Stream office map shows city names on hover, and region labels light up their offices.
   - Stats count up when their slide opens.
+  - Soft lime lights blink on the dot grid behind each slide, and thin light trails drift across now and then (off for reduced motion and on phones).
   - The footprint map can overlay Stream's offices on Mariner's sites.
   - The thank-you slide has call and email links.
 - Below 820px wide, the deck becomes one scrolling page for phones.

@@ -73,6 +73,9 @@ a { color: inherit; }
 .btn .arr { transition: transform .25s; }
 .btn:hover .arr { transform: translateX(4px); }
 
+/* ambient layer: blinking grid lights and slow light trails, behind slide content */
+.ambient { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
 /* ---------- 1. cover ---------- */
 #cover { background: var(--black); }
 .cover-photo { position: absolute; left: -40px; right: -40px; bottom: -20px; height: 560px; background: url("assets/photos/network-globe.jpg") 0% 100% / cover no-repeat; transform: translate(var(--px, 0), var(--py, 0)) scale(1.04); transition: transform .8s cubic-bezier(.2,.7,.2,1); }
@@ -243,6 +246,7 @@ a { color: inherit; }
   .mariner-mark { height: 16px; }
   .stream-mark { height: 22px; }
   .nav { display: none; }
+  .ambient { display: none; }
   .title { font-size: 42px; }
   .overline { font-size: 13px; }
 
@@ -691,6 +695,71 @@ document.getElementById("cover").addEventListener("pointermove", e => {
   p.style.setProperty("--py", (-ny * 14).toFixed(1) + "px");
 });
 
+/* ---- ambient lights: one canvas that moves to the active slide ----
+   Squares on Mariner's 32px grid blink softly; now and then a thin trail of light
+   runs along a grid row. Sits behind slide content; off for reduced motion and the phone layout. */
+const ambient = (() => {
+  const W = 1600, H = 900, STEP = 32, LIME = "211,255,40", WHITE = "250,251,255";
+  const cv = document.createElement("canvas");
+  cv.className = "ambient"; cv.width = W; cv.height = H; cv.setAttribute("aria-hidden", "true");
+  const ctx = cv.getContext("2d");
+  // keep lights clear of each slide's map, so the map stays perfectly still
+  const avoid = { partner: [80, 250, 1070, 860], footprint: [80, 260, 1070, 860] };
+  let lights = [], trails = [], slideId = null, raf = 0, last = 0, nextTrail = 0;
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function seed(id) {
+    const box = avoid[id];
+    lights = [];
+    while (lights.length < 46) {
+      const x = Math.floor(rand(1, W / STEP - 1)) * STEP + STEP / 2 - 1.5;
+      const y = Math.floor(rand(1, H / STEP - 1)) * STEP + STEP / 2 - 1.5;
+      if (box && x > box[0] && x < box[2] && y > box[1] && y < box[3]) continue;
+      lights.push({ x, y, phase: rand(0, Math.PI * 2), speed: rand(.35, .9), max: rand(.35, .7), col: Math.random() < .2 ? WHITE : LIME });
+    }
+    trails = [];
+  }
+  function frame(now) {
+    raf = requestAnimationFrame(frame);
+    const t = now / 1000, dt = last ? Math.min(.05, t - last) : 0;
+    last = t;
+    ctx.clearRect(0, 0, W, H);
+    for (const l of lights) {
+      const a = l.max * Math.pow(Math.max(0, Math.sin(t * l.speed + l.phase)), 4);  // mostly dark, brief soft blink
+      if (a < .02) continue;
+      ctx.fillStyle = `rgba(${l.col},${a.toFixed(3)})`;
+      ctx.fillRect(l.x, l.y, 3, 3);
+    }
+    if (t > nextTrail && trails.length < 2) {
+      const box = avoid[slideId];
+      let y;
+      do { y = Math.floor(rand(1, H / STEP - 1)) * STEP + STEP / 2; } while (box && y > box[1] - 8 && y < box[3] + 8);
+      trails.push({ x: -120, y, v: rand(110, 170) });
+      nextTrail = t + rand(3, 6);
+    }
+    trails = trails.filter(tr => {
+      tr.x += tr.v * dt;
+      const g = ctx.createLinearGradient(tr.x - 120, 0, tr.x, 0);
+      g.addColorStop(0, `rgba(${LIME},0)`); g.addColorStop(1, `rgba(${LIME},.35)`);
+      ctx.fillStyle = g; ctx.fillRect(tr.x - 120, tr.y - .5, 120, 1);
+      ctx.fillStyle = `rgba(${LIME},.6)`; ctx.fillRect(tr.x - 1.5, tr.y - 1.5, 3, 3);
+      return tr.x < W + 10;
+    });
+  }
+  function stop() { cancelAnimationFrame(raf); raf = 0; last = 0; }
+  function start() { if (!raf && !reduceMotion && !narrow.matches && !document.hidden) raf = requestAnimationFrame(frame); }
+  document.addEventListener("visibilitychange", () => document.hidden ? stop() : start());
+  return {
+    moveTo(slide) {
+      if (reduceMotion || narrow.matches) { stop(); cv.remove(); return; }
+      // insert under the slide's content: after the cover's photo band, otherwise first
+      const after = slide.querySelector(".cover-band");
+      slide.insertBefore(cv, after ? after.nextSibling : slide.firstChild);
+      if (slideId !== slide.id) { slideId = slide.id; seed(slide.id); }
+      start();
+    },
+  };
+})();
+
 /* ---- count-up ---- */
 function fmt(n, d) { return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
 function render(node, v) {
@@ -754,6 +823,7 @@ function go(i) {
   document.getElementById("next").disabled = i === slides.length - 1;
   cur = i;
   countUp(slides[i]);
+  ambient.moveTo(slides[i]);
   try { history.replaceState(null, "", "#" + slides[i].id); } catch (e) {}
 }
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(+b.dataset.go)));
