@@ -96,16 +96,10 @@ a { color: inherit; }
 .team-main { position: absolute; left: 80px; top: 128px; bottom: 64px; width: 960px; display: grid; grid-template-rows: auto 1fr; gap: 44px; }
 .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: start; }
 .person { position: relative; display: grid; gap: 18px; }
-.person .ph { position: relative; aspect-ratio: 4 / 5.3; overflow: hidden; background: var(--navy-2); border: 0; padding: 0; width: 100%; cursor: pointer; display: block; text-align: left; }
-.person img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 16%; filter: grayscale(1) contrast(1.05); transition: transform .6s cubic-bezier(.3,.7,.3,1), filter .5s; }
-.person .ph:hover img, .person.open img { filter: none; transform: scale(1.04); }
+.person .ph { position: relative; aspect-ratio: 4 / 5.3; overflow: hidden; background: var(--navy-2); }
+.person img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 16%; transition: transform .6s cubic-bezier(.3,.7,.3,1); }
+.person .ph:hover img { transform: scale(1.04); }
 .person .ph::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, transparent 55%, rgba(13,26,46,.55)); pointer-events: none; }
-.person .hint { position: absolute; z-index: 2; right: 0; top: 0; background: var(--lime); color: var(--black); font-family: var(--tech); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; padding: 6px 10px; transition: opacity .3s; }
-.person.open .hint { opacity: 0; }
-.drawer { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; background: var(--lime); color: var(--black); padding: 18px 20px 20px; display: grid; gap: 6px; transform: translateY(101%); transition: transform .45s cubic-bezier(.3,.7,.2,1); }
-.person.open .drawer { transform: none; }
-.drawer a { font-family: var(--tech); font-size: 17px; font-weight: 500; text-decoration: none; display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(0,0,0,.25); padding: 4px 0; }
-.drawer a:hover { border-bottom-color: #000; }
 .person h3 { font-family: var(--display); font-weight: 600; font-size: 32px; line-height: 1.05; color: var(--white); }
 .person p { font-size: 20px; color: var(--grey); margin-top: 4px; }
 .clients-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 480px; padding: 128px 64px 64px 56px; display: grid; grid-template-rows: auto auto 1fr; gap: 16px; border-left: 1px solid var(--lime-line);
@@ -132,8 +126,9 @@ a { color: inherit; }
 .usmap .st.hl { fill: #2C4A73; }  /* states with Stream offices: a lighter navy */
 .usmap .dot { fill: var(--white); stroke: var(--black); stroke-width: 2; cursor: pointer; transition: fill .2s; }
 .usmap .dot:hover, .usmap .dot:focus, .usmap .dot.on { fill: var(--lime); outline: none; }
-.usmap .rlbl { font-family: var(--tech); font-size: 14px; font-weight: 500; letter-spacing: .1em; fill: var(--grey); text-transform: uppercase; cursor: pointer; transition: fill .2s; }
-.usmap .rlbl.on, .usmap .rlbl:hover { fill: var(--lime); }
+.usmap .olbl { font-family: var(--tech); font-size: 15px; font-weight: 500; fill: var(--text); cursor: default; transition: fill .2s; }
+.usmap .olbl.on { fill: var(--lime); }
+.usmap .rgrp { font-family: var(--tech); font-size: 11.5px; font-weight: 500; letter-spacing: .14em; fill: var(--grey); }
 .usmap .lead { stroke: var(--grey); stroke-width: .8; opacity: .6; }
 .usmap .layer { transition: opacity .3s; }
 .usmap .layer.off { opacity: 0; pointer-events: none; }
@@ -265,8 +260,6 @@ a { color: inherit; }
   .people { grid-template-columns: 1fr 1fr; gap: 16px; }
   .person h3 { font-size: 21px; }
   .person p { font-size: 15px; }
-  .drawer { padding: 10px; }
-  .drawer a { font-size: 12px; }
   .clients-panel, .platform, .fp-panel { margin: 0 -16px; padding: 28px 16px; border-left: 0; border-top: 1px solid var(--lime-line); }
   .client { min-height: 64px; }
   .client .wm { font-size: 18px; }
@@ -334,8 +327,8 @@ a { color: inherit; }
         <div class="people" id="people"></div>
       </div>
       <aside class="clients-panel">
-        <span class="overline rise" style="--d:2">Representative clients</span>
-        <h3 class="rise" style="--d:3">Logistics</h3>
+        <span class="overline rise" style="--d:2">Representative logistics clients</span>
+        <h3 class="rise" style="--d:3">Our Track Record</h3>
         <!-- Logos are transparent PNG/SVG files in assets/clients/, shown in full color on white tiles. To add one: replace a <span class="wm …"> with <img class="logo" src="assets/clients/name.png" alt="…"> -->
         <ul class="client-grid rise" style="--d:4">
           <li class="client"><img class="logo" src="assets/clients/ch-robinson.png" alt="C.H. Robinson" style="max-width:90%"></li>
@@ -353,7 +346,7 @@ a { color: inherit; }
 
     <!-- 3. Your real estate partner -->
     <section class="slide" id="partner" data-name="Stream" aria-label="Your real estate partner">
-      <header class="slide-head" style="right:550px">
+      <header class="slide-head">
         <img class="mariner-mark" src="assets/mariner-logo.svg" alt="Mariner">
         <img class="stream-mark" src="assets/stream-logo-navy.png" alt="Stream Realty Partners">
       </header>
@@ -403,7 +396,7 @@ a { color: inherit; }
 
     <!-- 4. Understanding your footprint -->
     <section class="slide navy" id="footprint" data-name="Footprint" aria-label="Understanding your footprint">
-      <header class="slide-head" style="right:550px">
+      <header class="slide-head">
         <img class="mariner-mark" src="assets/mariner-logo.svg" alt="Mariner">
         <img class="stream-mark" src="assets/stream-logo-navy.png" alt="Stream Realty Partners">
       </header>
@@ -447,7 +440,7 @@ a { color: inherit; }
       <img class="close-icon rise" src="assets/mariner-icon.svg" alt="">
       <div class="close-copy">
         <h2 class="rise" style="--d:1">Thank you<span class="lime">.</span></h2>
-        <p class="rise" style="--d:2">We look forward to working with <b>Mariner</b>.</p>
+        <p class="rise" style="--d:2">We look forward to working with <b>Mariner Logistics</b>.</p>
       </div>
       <div class="contacts rise" style="--d:3" id="contacts"></div>
       <div class="close-foot">
@@ -542,29 +535,44 @@ function officeLayer(svg, map, withLabels) {
     return c;
   });
   if (withLabels) {
-    // region labels with leader lines, as on Stream's office map
-    const L = {
-      "Southern California": [40, 420, "start"], "Phoenix": [214, 432, "start"], "Denver": [342, 240, "middle"],
-      "Texas": [392, 570, "middle"], "Chicago": [592, 196, "middle"], "Nashville": [640, 322, "middle"],
-      "Atlanta": [690, 446, "middle"], "Carolinas": [800, 382, "start"], "D.C. | MD | VA": [850, 250, "start"],
-      "Florida": [850, 532, "start"],
+    // every office named, with leader lines and group headings, as on Stream's office map
+    const LABELS = {
+      "Los Angeles": [8, 426, "start"], "Orange County": [8, 443, "start"], "Inland Empire": [8, 460, "start"],
+      "Phoenix": [214, 404, "start"], "Denver": [343, 256, "middle"],
+      "Fort Worth": [464, 423, "end"], "Dallas": [492, 423, "start"],
+      "Austin": [452, 494, "end"], "San Antonio": [436, 522, "end"], "Houston": [522, 514, "start"],
+      "Rosemont": [620, 214, "end"], "Fulton Market": [620, 231, "end"],
+      "Nashville": [665, 340, "middle"], "Atlanta": [702, 423, "end"],
+      "Charlotte": [792, 365, "start"], "Greenville": [792, 382, "start"],
+      "Washington, D.C.": [838, 269, "start"], "Northern Virginia": [838, 286, "start"],
+      "Orlando": [838, 513, "start"], "Tampa": [838, 530, "start"], "Miami": [838, 577, "start"],
     };
-    Object.entries(L).forEach(([region, [x, y, anchor]]) => {
-      const pts = M.offices.filter(o => o.region === region);
-      const cx = pts.reduce((a, o) => a + o.x, 0) / pts.length, cy = pts.reduce((a, o) => a + o.y, 0) / pts.length;
-      svgEl("line", { x1: cx, y1: cy, x2: anchor === "start" ? x - 4 : x, y2: y + (y > cy ? -12 : 4), class: "lead" }, g);
-      const t = svgEl("text", { x, y, "text-anchor": anchor, class: "rlbl", tabindex: 0 }, g);
-      t.textContent = region;
-      const on = () => {
-        t.classList.add("on");
-        dots.forEach(d => d.classList.toggle("on", d.dataset.region === region));
-        map.show(cx, cy, pts.map(o => esc(o.name)).join(" · ") + `<small>${esc(region)}</small>`);
-      };
-      const off = () => { t.classList.remove("on"); dots.forEach(d => d.classList.remove("on")); map.hide(); };
-      t.addEventListener("mouseenter", on); t.addEventListener("focus", on);
-      t.addEventListener("mouseleave", off); t.addEventListener("blur", off);
+    const GROUPS = [["Southern", 8, 394, "start"], ["California", 8, 408, "start"], ["Chicago", 620, 199, "end"], ["Carolinas", 792, 349, "start"],
+      ["D.C. | MD | VA", 838, 253, "start"], ["Florida", 838, 497, "start"]];
+    const lines = svgEl("g", {}, g);
+    g.insertBefore(lines, g.firstChild);  // leader lines sit under the dots
+    GROUPS.forEach(([t, x, y, anchor]) => { svgEl("text", { x, y, "text-anchor": anchor, class: "rgrp" }, g).textContent = t.toUpperCase(); });
+    const labels = M.offices.map((o, i) => {
+      const [x, y, anchor] = LABELS[o.name];
+      const t = svgEl("text", { x, y, "text-anchor": anchor, class: "olbl" }, g);
+      t.textContent = o.name;
+      const on = () => { t.classList.add("on"); dots[i].classList.add("on"); };
+      const off = () => { t.classList.remove("on"); dots[i].classList.remove("on"); };
+      t.addEventListener("mouseenter", on); t.addEventListener("mouseleave", off);
+      dots[i].addEventListener("mouseenter", on); dots[i].addEventListener("mouseleave", off);
+      return t;
     });
-    g.querySelectorAll(".lead").forEach(l => g.insertBefore(l, g.firstChild)); // lines under dots
+    // draw leaders once the font has loaded, from each dot to the nearest edge of its label
+    const drawLeaders = () => {
+      lines.replaceChildren();
+      M.offices.forEach((o, i) => {
+        const bb = labels[i].getBBox();
+        const tx = Math.max(bb.x - 3, Math.min(bb.x + bb.width + 3, o.x)), ty = Math.max(bb.y + 2, Math.min(bb.y + bb.height - 2, o.y));
+        if (Math.hypot(tx - o.x, ty - o.y) > 9) svgEl("line", { x1: o.x, y1: o.y, x2: tx, y2: ty, class: "lead" }, lines);
+      });
+    };
+    drawLeaders();
+    document.fonts?.ready.then(drawLeaders);
   }
   return g;
 }
@@ -638,37 +646,16 @@ function officeLayer(svg, map, withLabels) {
   });
 })();
 
-/* ---- team cards: tap a photo to open contact details ---- */
+/* ---- team cards ---- */
 (function team() {
   const people = document.getElementById("people");
   TEAM.forEach((p, i) => {
     const card = document.createElement("div");
     card.className = "person rise";
     card.style.setProperty("--d", i + 2);
-    card.innerHTML = `
-      <button class="ph" type="button" aria-expanded="false" aria-label="Show contact details for ${esc(p.name)}">
-        <img src="${esc(p.photo)}" alt="${esc(p.name)}">
-        <span class="hint">Contact</span>
-      </button>
-      <div class="drawer" inert>
-        <a href="${telHref(p.phone)}">${esc(p.phone)} <span>›</span></a>
-        <a href="mailto:${esc(p.email)}">Email ${esc(p.name.split(" ")[0])} <span>›</span></a>
-      </div>
+    card.innerHTML = `<div class="ph"><img src="${esc(p.photo)}" alt="${esc(p.name)}"></div>
       <div><h3>${esc(p.name)}</h3><p>${esc(p.role)}</p></div>`;
-    // the drawer sits over the photo; keep it inside the photo box
-    card.querySelector(".ph").appendChild(card.querySelector(".drawer"));
     people.appendChild(card);
-  });
-  people.addEventListener("click", e => {
-    const ph = e.target.closest(".ph");
-    if (!ph || e.target.closest(".drawer")) return;
-    const card = ph.parentElement, open = !card.classList.contains("open");
-    people.querySelectorAll(".person").forEach(c => {
-      const on = c === card && open;
-      c.classList.toggle("open", on);
-      c.querySelector(".ph").setAttribute("aria-expanded", on);
-      c.querySelector(".drawer").inert = !on;
-    });
   });
 })();
 
