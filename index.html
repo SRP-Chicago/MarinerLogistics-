@@ -811,7 +811,6 @@ function go(i) {
   cur = i;
   countUp(slides[i]);
   ambient.moveTo(slides[i]);
-  try { history.replaceState(null, "", "#" + slides[i].id); } catch (e) {}
 }
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(+b.dataset.go)));
 document.getElementById("prev").addEventListener("click", () => go(cur - 1));
@@ -849,10 +848,14 @@ function fit() {
 }
 addEventListener("resize", fit);
 narrow.addEventListener?.("change", fit);
+// in-page links like #team still jump to a slide while the deck is open
 const fromHash = () => slides.findIndex(s => s.id === location.hash.slice(1));
 addEventListener("hashchange", () => { const i = fromHash(); if (i >= 0) go(i); });
+// always open on the cover, whatever address it was opened from
+try { if (location.hash) history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+scrollTo(0, 0);
 fit();
-go(Math.max(0, fromHash()));
+go(0);
 </script>
 </body>
 </html>

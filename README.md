@@ -5,7 +5,7 @@ Interactive pitch deck from the Stream Realty Partners Chicago Tenant Rep team f
 ## Presenting
 
 - **Navigate:** arrow keys, Page Up/Down, the space bar, swipe, or click a stop on the route bar. `Home` and `End` jump to the first and last slide; `F` toggles full screen.
-- **Deep links:** `#cover`, `#team`, `#partner`, `#footprint`, `#close`.
+- **Opening:** the deck always opens on the cover, even from a link or address that names another slide.
 - **Interactive bits:**
   - The cover globe drifts with the pointer.
   - The Stream office map names every office with leader lines, as on Stream's own map; hovering a name or dot highlights it.
