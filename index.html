@@ -615,13 +615,13 @@ function officeLayer(svg, map, withLabels) {
   // counties, with the ones holding a site lifted slightly
   const siteCounties = new Set(["Dallas", "Tarrant"]);
   D.counties.forEach(c => svgEl("path", { d: c.d, class: "cty" + (siteCounties.has(c.name) ? " has" : "") }, svg));
-  // county names: Dallas and Tarrant sit along their top edge, clear of the city labels; others at their visible middle
-  const at = { Dallas: [665, 128], Tarrant: [315, 128] };
-  const skip = new Set(["Hunt", "Rockwall"]);  // only slivers of these show
+  // county names at each county's middle; Dallas and Tarrant sit along their top edge, clear of the city labels.
+  // Counties cut off by the frame or too narrow for a name are left unlabeled.
   D.counties.forEach(c => {
-    if (skip.has(c.name)) return;
-    const [x, y] = at[c.name] || [Math.max(80, Math.min(D.w - 80, c.cx)), Math.max(26, Math.min(D.h - 16, c.cy))];
-    svgEl("text", { x, y, "text-anchor": "middle", class: "ctylbl" }, svg).textContent = c.name.toUpperCase() + " CO.";
+    const top = c.name === "Dallas" || c.name === "Tarrant";
+    const x = c.name === "Dallas" ? c.cx + c.w / 4 : c.cx, y = top ? c.top + 16 : c.cy + 4;  // Dallas: right of Coppell's label
+    if (c.w < 60 || x < 50 || x > D.w - 50 || y < 18 || y > D.h - 10) return;
+    svgEl("text", { x, y, "text-anchor": "middle", class: "ctylbl" }, svg).textContent = c.name.toUpperCase();
   });
   // reference points
   [["DALLAS", -96.797, 32.7767, 10, 4, "start"], ["FORT WORTH", -97.3308, 32.7555, 10, 16, "start"], ["DFW AIRPORT", -97.0403, 32.8998, -10, 4, "end"]].forEach(([t, lon, lat, dx, dy, anchor]) => {
