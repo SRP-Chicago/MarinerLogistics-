@@ -180,16 +180,42 @@ a { color: inherit; }
 .fp-stats > div:first-child { border-left: 0; padding-left: 0; }
 .fp-stats .stat-val { font-size: 44px; }
 .fp-stats .stat-lbl { font-size: 14px; }
-.site-list { list-style: none; padding: 18px 40px 32px; display: grid; align-content: start; gap: 8px; overflow: auto; }
-.site { border: 1px solid var(--rule); background: rgba(13,26,46,.7); padding: 12px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: center; cursor: pointer; text-align: left; width: 100%; transition: border-color .2s, background .2s; }
+.site-list { list-style: none; padding: 14px 40px 28px; display: grid; align-content: start; gap: 8px; overflow: auto; }
+.site { border: 1px solid var(--rule); background: rgba(13,26,46,.7); padding: 12px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 3px 14px; align-items: baseline; cursor: pointer; text-align: left; width: 100%; transition: border-color .2s, background .2s; color: inherit; }
 .site:hover, .site.on { border-color: var(--lime); background: rgba(211,255,40,.08); }
-.site i { width: 10px; height: 10px; background: var(--lime); grid-row: span 2; }
-.site b { font-family: var(--display); font-weight: 600; font-size: 19px; color: var(--white); }
-.site small { grid-column: 2; font-size: 14px; color: var(--grey); }
-.site em { grid-row: 1 / span 2; grid-column: 3; font-style: normal; font-family: var(--tech); font-size: 13px; letter-spacing: .08em; color: var(--lime); text-transform: uppercase; }
-.site.empty { border-style: dashed; cursor: default; }
-.site.empty i { background: transparent; border: 1.5px dashed var(--grey); }
-.site.empty b { color: var(--grey); font-weight: 400; }
+.site i { width: 10px; height: 10px; background: var(--lime); align-self: center; grid-row: 1; }
+.site b { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--white); }
+.site em { font-style: normal; font-family: var(--tech); font-size: 15px; letter-spacing: .04em; color: var(--lime); white-space: nowrap; }
+.site small { grid-column: 2 / -1; font-size: 15px; color: var(--text); }
+.site .note { grid-column: 2 / -1; font-family: var(--tech); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--lime); }
+
+/* DFW map: county outlines, site pins, photo pop-out */
+.dfwmap { width: 100%; height: 100%; display: block; }
+.dfwmap .cty { fill: var(--navy-3); stroke: var(--navy); stroke-width: 1.5; }
+.dfwmap .cty.has { fill: #2C4A73; }
+.dfwmap .ctylbl { font-family: var(--tech); font-size: 11px; letter-spacing: .18em; fill: rgba(162,166,184,.7); }
+.dfwmap .ref { font-family: var(--tech); font-size: 12px; letter-spacing: .14em; fill: var(--grey); }
+.dfwmap .refdot { fill: var(--grey); }
+.dfwmap .layer { transition: opacity .3s; }
+.dfwmap .layer.off { opacity: 0; pointer-events: none; }
+.dfwmap .sdot { fill: var(--white); stroke: var(--black); stroke-width: 2; }
+.dfwmap .slbl { font-family: var(--tech); font-size: 12px; letter-spacing: .06em; fill: var(--white); }
+.dfwmap .pin { fill: var(--lime); stroke: var(--black); stroke-width: 2.5; cursor: pointer; transition: fill .2s; }
+.dfwmap .pin:hover, .dfwmap .pin.on, .dfwmap .pin:focus { fill: var(--white); outline: none; }
+.dfwmap .plbl { font-family: var(--tech); font-size: 19px; font-weight: 600; fill: var(--white); cursor: pointer; }
+.dfwmap .psf { font-family: var(--tech); font-size: 14px; fill: var(--lime); cursor: pointer; }
+.site-pop { position: absolute; z-index: 4; width: 300px; background: var(--navy); border: 1px solid var(--lime); box-shadow: 0 18px 40px rgba(0,0,0,.55); opacity: 0; transform: scale(.85); pointer-events: none; transition: opacity .25s ease, transform .3s cubic-bezier(.2,.8,.2,1); }
+.site-pop.open { opacity: 1; transform: none; pointer-events: auto; }
+.site-pop .shot { aspect-ratio: 16 / 10; background: repeating-linear-gradient(45deg, rgba(211,255,40,.05) 0 10px, transparent 10px 20px), var(--navy-2); border-bottom: 1px solid var(--lime-line); display: grid; place-items: center; align-content: center; gap: 8px; color: var(--grey); font-family: var(--tech); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; overflow: hidden; }
+.site-pop .shot svg { width: 34px; height: 34px; fill: none; stroke: var(--grey); stroke-width: 1.6; }
+.site-pop .shot img { width: 100%; height: 100%; object-fit: cover; }
+.site-pop .body { padding: 14px 16px 16px; display: grid; gap: 4px; }
+.site-pop h4 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 22px; color: var(--white); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.site-pop h4 span { font-family: var(--tech); font-size: 15px; font-weight: 500; color: var(--lime); }
+.site-pop p { margin: 0; font-size: 15px; color: var(--text); }
+.site-pop .note { font-family: var(--tech); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--lime); }
+.site-pop .x { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border: 0; background: rgba(0,0,0,.6); color: var(--white); font-size: 18px; line-height: 1; cursor: pointer; }
+.site-pop .x:hover { background: var(--lime); color: var(--black); }
 
 /* ---------- 5. close ---------- */
 #close { background: linear-gradient(90deg, rgba(0,0,0,.96) 0%, rgba(0,0,0,.82) 45%, rgba(0,0,0,.35) 100%), url("assets/photos/city-night.jpg") 50% 50% / cover; }
@@ -403,7 +429,7 @@ a { color: inherit; }
       <div class="fp-main">
         <div class="fp-headrow">
           <div style="display:grid;gap:14px">
-            <span class="overline rise">The Mariner network</span>
+            <span class="overline rise">The Mariner network · Dallas–Fort Worth</span>
             <h2 class="title rise" style="--d:1">Understanding <span class="lime">Your Footprint</span></h2>
           </div>
           <div class="chips rise" style="--d:2" id="fpChips">
@@ -411,8 +437,9 @@ a { color: inherit; }
           </div>
         </div>
         <div class="map-wrap rise" style="--d:2">
-          <svg class="usmap" id="footprintMap" viewBox="0 0 975 610" role="img" aria-label="Map of Mariner's locations"></svg>
+          <svg class="dfwmap" id="footprintMap" role="img" aria-label="Map of Mariner's Dallas-Fort Worth locations"></svg>
           <div class="map-tip" hidden></div>
+          <div class="site-pop" id="sitePop" role="dialog" aria-label="Site details"></div>
         </div>
       </div>
       <aside class="fp-panel">
@@ -420,12 +447,12 @@ a { color: inherit; }
         <div class="fp-stats rise" style="--d:2">
           <div><div class="stat-val num" id="fpSites">—</div><div class="stat-lbl">Sites</div></div>
           <div><div class="stat-val num" id="fpSf">—</div><div class="stat-lbl">Total SF</div></div>
-          <div><div class="stat-val num" id="fpStates">—</div><div class="stat-lbl">States</div></div>
+          <div><div class="stat-val">DFW</div><div class="stat-lbl">Market</div></div>
         </div>
         <div style="display:grid;align-content:start;min-height:0">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 40px 0;gap:12px">
             <span class="label">Current locations</span>
-            <span class="draft" id="fpDraft">Draft · team to provide</span>
+            <span class="label">Tap a site for photos</span>
           </div>
           <ul class="site-list rise" style="--d:3" id="siteList"></ul>
         </div>
@@ -465,6 +492,7 @@ a { color: inherit; }
 </nav>
 
 <script src="assets/us-map.js"></script>
+<script src="assets/dfw-map.js"></script>
 <script>
 /* ---- Team: used on the team slide and the thank-you slide ---- */
 const TEAM = [
@@ -473,11 +501,13 @@ const TEAM = [
   { name: "Phil Geiger",   role: "Managing Director", phone: "312.576.6713", email: "phil.geiger@streamrealty.com",   photo: "assets/phil-geiger.jpg" },
 ];
 
-/* ---- Footprint: Mariner's current locations, to come from the team.
-   One object per site; lat/lon place the pin, sf feeds the totals. Example:
-   { name: "Headquarters", type: "Office", city: "Coppell", state: "TX", lat: 32.9546, lon: -97.0150, sf: 25000 },
-   Types become filter chips automatically. ---- */
+/* ---- Footprint: Mariner's current locations.
+   lat/lon place the pin; sf feeds the totals; note adds a line under the address.
+   photo: set to an image path (e.g. "assets/sites/coppell.jpg") to replace the placeholder in the pop-out. ---- */
 const FOOTPRINT = [
+  { city: "Coppell",    state: "TX", sf: 150000, address: "330 S Royal Ln, Coppell, TX 75019",          lat: 32.9445, lon: -97.0223, photo: null },
+  { city: "DeSoto",     state: "TX", sf: 300000, address: "1221 E Centre Park Blvd, DeSoto, TX 75115",  lat: 32.6253, lon: -96.8279, photo: null, note: "Golf Relay (sister company)" },
+  { city: "Fort Worth", state: "TX", sf: 250000, address: "2555 Downing Dr, Fort Worth, TX 76106",      lat: 32.8197, lon: -97.3252, photo: null },
 ];
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -491,15 +521,6 @@ const svgEl = (tag, attrs = {}, parent) => {
 };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const telHref = p => "tel:+1" + p.replace(/\D/g, "");
-
-/* Albers USA (lower 48), matching the projection the state outlines were drawn with */
-function project(lon, lat) {
-  const R = Math.PI / 180, p0 = 29.5 * R, p1 = 45.5 * R;
-  const n = (Math.sin(p0) + Math.sin(p1)) / 2, C = Math.cos(p0) ** 2 + 2 * n * Math.sin(p0);
-  const raw = (l, p) => { const r = Math.sqrt(C - 2 * n * Math.sin(p)) / n; return [r * Math.sin(l * n), Math.sqrt(C) / n - r * Math.cos(l * n)]; };
-  const c = raw(-0.6 * R, 38.7 * R), [x, y] = raw((lon + 96) * R, lat * R);
-  return [487.5 + 1300 * (x - c[0]), 305 - 1300 * (y - c[1])];
-}
 
 /* ---- maps ---- */
 const M = window.US_MAP;
@@ -583,67 +604,97 @@ function officeLayer(svg, map, withLabels) {
   officeLayer(svg, baseMap(svg, true), true);
 })();
 
-/* slide 4: Mariner footprint, with Stream offices as an optional overlay */
+/* slide 4: Mariner's DFW sites on a county map; tap a site for its photo pop-out */
 (function footprint() {
+  const D = window.DFW_MAP;
   const svg = document.getElementById("footprintMap");
-  const map = baseMap(svg, false);
-  const stream = officeLayer(svg, map, false);
-  stream.classList.add("off");
-  const g = svgEl("g", { class: "layer" }, svg);
-  const list = document.getElementById("siteList");
-  const sites = FOOTPRINT.filter(s => s && s.lat != null && s.lon != null);
-  const items = [];
-  const select = (i, on) => {
-    items.forEach((it, k) => { it.row.classList.toggle("on", on && k === i); it.sq.classList.toggle("on", on && k === i); });
-    if (!on) return map.hide();
-    const { s, x, y } = items[i];
-    map.show(x, y - 4, `${esc(s.name || s.city)}<small>${esc([s.type, [s.city, s.state].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</small>`);
-  };
-  sites.forEach((s, i) => {
-    const [x, y] = project(+s.lon, +s.lat);
-    svgEl("rect", { x: x - 7, y: y - 7, width: 14, height: 14, class: "ping" }, g);
-    const sq = svgEl("rect", { x: x - 7, y: y - 7, width: 14, height: 14, class: "msq", tabindex: 0, "aria-label": `Mariner: ${s.name || s.city}` }, g);
-    const li = document.createElement("li");
-    const row = document.createElement("button");
-    row.type = "button"; row.className = "site"; row.dataset.type = s.type || "";
-    row.innerHTML = `<i></i><b>${esc(s.name || s.city || "Site")}</b><small>${esc([s.city, s.state].filter(Boolean).join(", "))}</small><em>${s.sf ? esc(Number(s.sf).toLocaleString("en-US")) + " SF" : esc(s.type || "")}</em>`;
-    li.appendChild(row); list.appendChild(li);
-    items.push({ s, x, y, sq, row });
-    [sq, row].forEach(n => {
-      n.addEventListener("mouseenter", () => select(i, true)); n.addEventListener("focus", () => select(i, true));
-      n.addEventListener("mouseleave", () => select(i, false)); n.addEventListener("blur", () => select(i, false));
-    });
+  svg.setAttribute("viewBox", `0 0 ${D.w} ${D.h}`);
+  const P = (lon, lat) => [(lon - D.lonMin) * D.kx, (D.latMax - lat) * D.ky];
+  const wrap = svg.parentElement, pop = document.getElementById("sitePop"), list = document.getElementById("siteList");
+  const fmtSf = n => "~" + Number(n).toLocaleString("en-US") + " SF";
+  // counties, with the ones holding a site lifted slightly
+  const siteCounties = new Set(["Dallas", "Tarrant"]);
+  D.counties.forEach(c => svgEl("path", { d: c.d, class: "cty" + (siteCounties.has(c.name) ? " has" : "") }, svg));
+  // county names: Dallas and Tarrant sit along their top edge, clear of the city labels; others at their visible middle
+  const at = { Dallas: [665, 128], Tarrant: [315, 128] };
+  const skip = new Set(["Hunt", "Rockwall"]);  // only slivers of these show
+  D.counties.forEach(c => {
+    if (skip.has(c.name)) return;
+    const [x, y] = at[c.name] || [Math.max(80, Math.min(D.w - 80, c.cx)), Math.max(26, Math.min(D.h - 16, c.cy))];
+    svgEl("text", { x, y, "text-anchor": "middle", class: "ctylbl" }, svg).textContent = c.name.toUpperCase() + " CO.";
   });
-  if (!sites.length) {
-    for (let i = 0; i < 3; i++) list.insertAdjacentHTML("beforeend", `<li><div class="site empty"><i></i><b>Site to come</b><small>Location details from the team</small></div></li>`);
-  } else {
-    document.getElementById("fpDraft").hidden = true;
-    const totalSf = sites.reduce((a, s) => a + (+s.sf || 0), 0);
-    const fill = (id, v, suffix = "", dec = 0) => { const n = document.getElementById(id); n.dataset.count = v; n.dataset.suffix = suffix; n.dataset.decimals = dec; };
-    fill("fpSites", sites.length);
-    if (totalSf >= 1e6) fill("fpSf", +(totalSf / 1e6).toFixed(1), "M", 1);
-    else if (totalSf) fill("fpSf", Math.round(totalSf / 1e3), "K");
-    fill("fpStates", new Set(sites.map(s => s.state).filter(Boolean)).size);
-    // one filter chip per site type
-    const types = [...new Set(sites.map(s => s.type).filter(Boolean))];
-    const chips = document.getElementById("fpChips");
-    if (types.length > 1) types.forEach(t => {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "chip sq"; b.setAttribute("aria-pressed", "true");
-      b.innerHTML = `<i></i>${esc(t)}`;
-      b.addEventListener("click", () => {
-        const on = b.getAttribute("aria-pressed") !== "true";
-        b.setAttribute("aria-pressed", on);
-        items.forEach(it => { if (it.s.type === t) { it.row.parentElement.hidden = !on; it.sq.style.display = on ? "" : "none"; it.sq.previousSibling.style.display = on ? "" : "none"; } });
-      });
-      chips.insertBefore(b, chips.firstChild);
-    });
-  }
+  // reference points
+  [["DALLAS", -96.797, 32.7767, 10, 4, "start"], ["FORT WORTH", -97.3308, 32.7555, 10, 16, "start"], ["DFW AIRPORT", -97.0403, 32.8998, -10, 4, "end"]].forEach(([t, lon, lat, dx, dy, anchor]) => {
+    const [x, y] = P(lon, lat);
+    svgEl("rect", { x: x - 3, y: y - 3, width: 6, height: 6, class: "refdot" }, svg);
+    svgEl("text", { x: x + dx, y: y + dy, "text-anchor": anchor, class: "ref" }, svg).textContent = t;
+  });
+  // Stream's two DFW offices, shown with the chip
+  const stream = svgEl("g", { class: "layer off" }, svg);
+  [["Stream · Dallas", -96.8040, 32.7920, 10, -8], ["Stream · Fort Worth", -97.3330, 32.7480, 10, 22]].forEach(([t, lon, lat, dx, dy]) => {
+    const [x, y] = P(lon, lat);
+    svgEl("circle", { cx: x, cy: y, r: 7, class: "sdot" }, stream);
+    svgEl("text", { x: x + dx, y: y + dy, class: "slbl" }, stream).textContent = t;
+  });
   document.querySelector('#fpChips [data-layer="stream"]').addEventListener("click", e => {
     const b = e.currentTarget, on = b.getAttribute("aria-pressed") !== "true";
     b.setAttribute("aria-pressed", on);
     stream.classList.toggle("off", !on);
   });
+
+  const pins = svgEl("g", {}, svg);
+  const items = FOOTPRINT.map((s, i) => {
+    const [x, y] = P(s.lon, s.lat);
+    svgEl("rect", { x: x - 9, y: y - 9, width: 18, height: 18, class: "ping" }, pins);
+    const pin = svgEl("rect", { x: x - 9, y: y - 9, width: 18, height: 18, class: "pin", tabindex: 0, role: "button", "aria-label": `${s.city} site: show photo and details` }, pins);
+    const left = s.city === "Fort Worth";  // keep Fort Worth's label inside the map's left edge
+    const lbl = svgEl("text", { x: x + (left ? 16 : 16), y: y - 2, class: "plbl" }, pins); lbl.textContent = s.city;
+    const sf = svgEl("text", { x: x + 16, y: y + 16, class: "psf" }, pins); sf.textContent = fmtSf(s.sf);
+    const li = document.createElement("li");
+    const row = document.createElement("button");
+    row.type = "button"; row.className = "site";
+    row.innerHTML = `<i></i><b>${esc(s.city)}, ${esc(s.state)}</b><em>${fmtSf(s.sf)}</em><small>${esc(s.address)}</small>` + (s.note ? `<span class="note">${esc(s.note)}</span>` : "");
+    li.appendChild(row); list.appendChild(li);
+    [pin, lbl, sf, row].forEach(n => n.addEventListener("click", e => { e.stopPropagation(); open(i); }));
+    pin.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); open(i); } });
+    return { s, x, y, pin, row };
+  });
+
+  let cur = -1;
+  function open(i) {
+    if (cur === i) return close();
+    cur = i;
+    const { s, x, y } = items[i];
+    items.forEach((it, k) => { it.pin.classList.toggle("on", k === i); it.row.classList.toggle("on", k === i); });
+    const shot = s.photo
+      ? `<img src="${esc(s.photo)}" alt="${esc(s.city)} site">`
+      : `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="26" height="20"/><path d="M3 22l8-8 6 6 4-4 8 8"/><circle cx="22" cy="12" r="2.5"/></svg>Site photo to come`;
+    pop.innerHTML = `<div class="shot">${shot}</div><div class="body"><h4>${esc(s.city)}, ${esc(s.state)}<span>${fmtSf(s.sf)}</span></h4><p>${esc(s.address)}</p>${s.note ? `<span class="note">${esc(s.note)}</span>` : ""}</div><button class="x" type="button" aria-label="Close">×</button>`;
+    pop.querySelector(".x").addEventListener("click", e => { e.stopPropagation(); close(); });
+    // place beside the pin, in the wrapper's own (unscaled) pixels
+    const sr = svg.getBoundingClientRect(), wr = wrap.getBoundingClientRect(), k = sr.width / svg.clientWidth || 1;
+    const w = svg.clientWidth, h = svg.clientHeight, sc = Math.min(w / D.w, h / D.h);
+    const px = (sr.left - wr.left) / k + (w - D.w * sc) / 2 + x * sc, py = (sr.top - wr.top) / k + (h - D.h * sc) / 2 + y * sc;
+    const pw = pop.offsetWidth, ph = pop.offsetHeight, W = wrap.clientWidth, H = wrap.clientHeight;
+    const right = px + 28 + pw <= W;
+    pop.style.left = (right ? px + 28 : Math.max(0, px - 28 - pw)) + "px";
+    pop.style.top = Math.max(0, Math.min(H - ph, py - ph / 2)) + "px";
+    pop.style.transformOrigin = `${right ? 0 : pw}px ${Math.max(0, Math.min(ph, py - parseFloat(pop.style.top)))}px`;
+    requestAnimationFrame(() => pop.classList.add("open"));
+  }
+  function close() {
+    cur = -1;
+    pop.classList.remove("open");
+    items.forEach(it => { it.pin.classList.remove("on"); it.row.classList.remove("on"); });
+  }
+  pop.addEventListener("click", e => e.stopPropagation());
+  document.addEventListener("click", () => { if (cur >= 0) close(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && cur >= 0) close(); });
+  window.closeSitePop = close;
+
+  const fill = (id, v, prefix = "", suffix = "") => { const n = document.getElementById(id); n.dataset.count = v; n.dataset.prefix = prefix; n.dataset.suffix = suffix; };
+  fill("fpSites", FOOTPRINT.length);
+  fill("fpSf", Math.round(FOOTPRINT.reduce((a, s) => a + s.sf, 0) / 1000), "~", "K");
 })();
 
 /* ---- team cards ---- */
@@ -810,6 +861,7 @@ function go(i) {
   document.getElementById("next").disabled = i === slides.length - 1;
   cur = i;
   countUp(slides[i]);
+  window.closeSitePop?.();
   ambient.moveTo(slides[i]);
 }
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(+b.dataset.go)));

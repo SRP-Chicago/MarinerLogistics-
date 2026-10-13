@@ -11,16 +11,16 @@ Interactive pitch deck from the Stream Realty Partners Chicago Tenant Rep team f
   - The Stream office map names every office with leader lines, as on Stream's own map; hovering a name or dot highlights it.
   - Stats count up when their slide opens.
   - Soft lime lights blink on the dot grid behind each slide, and thin light trails drift across now and then (off for reduced motion and on phones).
-  - The footprint map can overlay Stream's offices on Mariner's sites.
+  - On the footprint slide, tap a site (pin, name or list row) to pop out its photo and details; the Stream offices chip adds Stream's Dallas and Fort Worth offices.
   - The thank-you slide has call and email links.
 - Below 820px wide, the deck becomes one scrolling page for phones.
 
 ## Editing
 
 - **Team:** the `TEAM` array at the top of the script holds names, titles, phones, emails and headshots. It feeds both the team slide and the thank-you slide.
-- **Footprint:** the `FOOTPRINT` array (just below `TEAM`) holds Mariner's locations, which the team will provide. Add one object per site with `lat`/`lon`, and the pin, list row, totals and type filters build themselves. The "Draft" tag hides once there's a site. There's an example in the comment.
+- **Footprint:** the `FOOTPRINT` array (just below `TEAM`) holds Mariner's Coppell, DeSoto and Fort Worth sites: address, square footage, map position and an optional `note`. Each site has `photo: null` for now, which shows a placeholder in its pop-out; set it to an image path such as `assets/sites/coppell.jpg` to show the real photo. The map is `assets/dfw-map.js` (Dallas–Fort Worth county outlines from us-atlas).
 - **Look and feel:** follows marinerlogistics.com: black and navy (`#0D1A2E`) grounds, Mariner lime (`#D3FF28`), off-white type, square corners, and lime hairlines at 20%. The colors are taken from their site stylesheet, and all of them are `:root` tokens at the top of the style block.
 - **Type:** Mariner's site uses licensed Adobe/commercial faces (Axia, Video, Trasandina). The deck uses Exo, which their site also loads, plus Chakra Petch in place of Video for labels and buttons.
 - **Logos:** `assets/mariner-logo.svg` and `assets/mariner-icon.svg` are the SVGs served on marinerlogistics.com. Client logos live in `assets/clients/` as transparent PNG or SVG files: they show in full color on white tiles. Five were supplied as images; the Hirschbach, loadsmart and ShipBob SVGs come from those companies' websites. Scotlynn is still a typographic wordmark until its file arrives (see the comment in the markup).
 - **Photos:** `assets/photos/`, supplied for the deck.
-- **Map:** `assets/us-map.js` holds the state outlines (us-atlas, Albers USA), the states Stream operates in, and Stream's 21 office points. The deck projects footprint lat/lon with the same projection.
+- **Maps:** `assets/us-map.js` holds the US state outlines (us-atlas, Albers USA), the states Stream operates in, and Stream's 21 office points. `assets/dfw-map.js` holds the Dallas–Fort Worth county outlines for the footprint slide.
