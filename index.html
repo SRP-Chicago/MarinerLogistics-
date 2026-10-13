@@ -187,6 +187,8 @@ a { color: inherit; }
 .site b { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--white); }
 .site em { font-style: normal; font-family: var(--tech); font-size: 15px; letter-spacing: .04em; color: var(--lime); white-space: nowrap; }
 .site small { grid-column: 2 / -1; font-size: 15px; color: var(--text); }
+.site .specs { grid-column: 2 / -1; font-family: var(--tech); font-size: 13px; letter-spacing: .06em; color: var(--grey); }
+.site .specs .sep { margin: 0 8px; color: var(--lime); }
 .site .note { grid-column: 2 / -1; font-family: var(--tech); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--lime); }
 
 /* DFW map: county outlines, site pins, photo pop-out */
@@ -213,6 +215,11 @@ a { color: inherit; }
 .site-pop h4 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 22px; color: var(--white); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .site-pop h4 span { font-family: var(--tech); font-size: 15px; font-weight: 500; color: var(--lime); }
 .site-pop p { margin: 0; font-size: 15px; color: var(--text); }
+.site-pop .pspecs { margin: 6px 0 2px; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.site-pop .pspecs div { padding: 8px 0; }
+.site-pop .pspecs div + div { border-left: 1px solid var(--rule); padding-left: 12px; }
+.site-pop dt { font-family: var(--tech); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); }
+.site-pop dd { margin: 2px 0 0; font-family: var(--display); font-size: 20px; font-weight: 500; color: var(--white); }
 .site-pop .note { font-family: var(--tech); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--lime); }
 .site-pop .x { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border: 0; background: rgba(0,0,0,.6); color: var(--white); font-size: 18px; line-height: 1; cursor: pointer; }
 .site-pop .x:hover { background: var(--lime); color: var(--black); }
@@ -502,12 +509,12 @@ const TEAM = [
 ];
 
 /* ---- Footprint: Mariner's current locations.
-   lat/lon place the pin; sf feeds the totals; note adds a line under the address.
+   lat/lon place the pin; sf feeds the totals; built (year) and clear (feet) show as specs; note adds a line under the address.
    photo: set to an image path (e.g. "assets/sites/coppell.jpg") to replace the placeholder in the pop-out. ---- */
 const FOOTPRINT = [
-  { city: "Coppell",    state: "TX", sf: 150000, address: "330 S Royal Ln, Coppell, TX 75019",          lat: 32.9445, lon: -97.0223, photo: null },
-  { city: "DeSoto",     state: "TX", sf: 300000, address: "1221 E Centre Park Blvd, DeSoto, TX 75115",  lat: 32.6253, lon: -96.8279, photo: null, note: "Golf Relay (sister company)" },
-  { city: "Fort Worth", state: "TX", sf: 250000, address: "2555 Downing Dr, Fort Worth, TX 76106",      lat: 32.8197, lon: -97.3252, photo: null },
+  { city: "Coppell",    state: "TX", sf: 150000, address: "330 S Royal Ln, Coppell, TX 75019",          built: 2014, clear: 28, lat: 32.9445, lon: -97.0223, photo: null },
+  { city: "DeSoto",     state: "TX", sf: 300000, address: "1221 E Centre Park Blvd, DeSoto, TX 75115",  built: 2008, clear: 32, lat: 32.6253, lon: -96.8279, photo: null, note: "Golf Relay (sister company)" },
+  { city: "Fort Worth", state: "TX", sf: 250000, address: "2555 Downing Dr, Fort Worth, TX 76106",      built: 2022, clear: 36, lat: 32.8197, lon: -97.3252, photo: null },
 ];
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -612,6 +619,7 @@ function officeLayer(svg, map, withLabels) {
   const P = (lon, lat) => [(lon - D.lonMin) * D.kx, (D.latMax - lat) * D.ky];
   const wrap = svg.parentElement, pop = document.getElementById("sitePop"), list = document.getElementById("siteList");
   const fmtSf = n => "~" + Number(n).toLocaleString("en-US") + " SF";
+  const specs = s => [s.built && `Built ${s.built}`, s.clear && `${s.clear}′ clear`].filter(Boolean);
   // counties, with the ones holding a site lifted slightly
   const siteCounties = new Set(["Dallas", "Tarrant"]);
   D.counties.forEach(c => svgEl("path", { d: c.d, class: "cty" + (siteCounties.has(c.name) ? " has" : "") }, svg));
@@ -653,7 +661,9 @@ function officeLayer(svg, map, withLabels) {
     const li = document.createElement("li");
     const row = document.createElement("button");
     row.type = "button"; row.className = "site";
-    row.innerHTML = `<i></i><b>${esc(s.city)}, ${esc(s.state)}</b><em>${fmtSf(s.sf)}</em><small>${esc(s.address)}</small>` + (s.note ? `<span class="note">${esc(s.note)}</span>` : "");
+    row.innerHTML = `<i></i><b>${esc(s.city)}, ${esc(s.state)}</b><em>${fmtSf(s.sf)}</em><small>${esc(s.address)}</small>`
+      + (specs(s).length ? `<span class="specs">${specs(s).map(esc).join('<span class="sep">·</span>')}</span>` : "")
+      + (s.note ? `<span class="note">${esc(s.note)}</span>` : "");
     li.appendChild(row); list.appendChild(li);
     [pin, lbl, sf, row].forEach(n => n.addEventListener("click", e => { e.stopPropagation(); open(i); }));
     pin.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); open(i); } });
@@ -669,7 +679,7 @@ function officeLayer(svg, map, withLabels) {
     const shot = s.photo
       ? `<img src="${esc(s.photo)}" alt="${esc(s.city)} site">`
       : `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="26" height="20"/><path d="M3 22l8-8 6 6 4-4 8 8"/><circle cx="22" cy="12" r="2.5"/></svg>Site photo to come`;
-    pop.innerHTML = `<div class="shot">${shot}</div><div class="body"><h4>${esc(s.city)}, ${esc(s.state)}<span>${fmtSf(s.sf)}</span></h4><p>${esc(s.address)}</p>${s.note ? `<span class="note">${esc(s.note)}</span>` : ""}</div><button class="x" type="button" aria-label="Close">×</button>`;
+    pop.innerHTML = `<div class="shot">${shot}</div><div class="body"><h4>${esc(s.city)}, ${esc(s.state)}<span>${fmtSf(s.sf)}</span></h4><p>${esc(s.address)}</p>${specs(s).length ? `<dl class="pspecs">${s.built ? `<div><dt>Year built</dt><dd>${esc(s.built)}</dd></div>` : ""}${s.clear ? `<div><dt>Clear height</dt><dd>${esc(s.clear)} ft</dd></div>` : ""}</dl>` : ""}${s.note ? `<span class="note">${esc(s.note)}</span>` : ""}</div><button class="x" type="button" aria-label="Close">×</button>`;
     pop.querySelector(".x").addEventListener("click", e => { e.stopPropagation(); close(); });
     // place beside the pin, in the wrapper's own (unscaled) pixels
     const sr = svg.getBoundingClientRect(), wr = wrap.getBoundingClientRect(), k = sr.width / svg.clientWidth || 1;
