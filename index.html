@@ -94,7 +94,7 @@ a { color: inherit; }
 
 /* ---------- 2. team ---------- */
 .team-main { position: absolute; left: 80px; top: 128px; bottom: 64px; width: 960px; display: grid; grid-template-rows: auto 1fr; gap: 44px; }
-.people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: start; }
+.people { display: grid; grid-template-columns: repeat(2, 340px); gap: 40px; align-items: start; }
 .person { position: relative; display: grid; gap: 18px; }
 .person .ph { position: relative; aspect-ratio: 4 / 5.3; overflow: hidden; background: var(--navy-2); }
 .person img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 16%; transition: transform .6s cubic-bezier(.3,.7,.3,1); }
@@ -233,7 +233,7 @@ a { color: inherit; }
 .close-copy h2 { font-family: var(--display); font-weight: 500; font-size: 180px; line-height: .9; letter-spacing: -.02em; color: var(--white); }
 .close-copy p { font-size: 28px; font-weight: 300; color: var(--text); }
 .close-copy p b { color: var(--lime); font-weight: 500; }
-.contacts { position: absolute; left: 80px; right: 80px; top: 548px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; }
+.contacts { position: absolute; left: 80px; right: 80px; top: 548px; display: grid; grid-template-columns: repeat(2, 460px); gap: 80px; }
 .contact h3 { font-family: var(--display); font-weight: 600; font-size: 28px; color: var(--white); line-height: 1.1; }
 .contact > p { font-size: 18px; color: var(--grey); margin: 2px 0 12px; }
 .clink { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); font-family: var(--tech); font-size: 17px; letter-spacing: .02em; color: var(--text); text-decoration: underline; text-decoration-color: rgba(250,251,255,.35); text-underline-offset: 4px; transition: color .2s, border-color .2s; background: none; border-top: 0; border-left: 0; border-right: 0; width: 100%; cursor: pointer; text-align: left; }
@@ -356,7 +356,7 @@ a { color: inherit; }
       </header>
       <div class="team-main">
         <div style="display:grid;gap:14px">
-          <span class="overline rise">Chicago Tenant Representation</span>
+          <span class="overline rise">Your Stream Team</span>
           <h2 class="title rise" style="--d:1">Your Business, <span class="lime">Our Focus</span></h2>
         </div>
         <div class="people" id="people"></div>
@@ -506,8 +506,7 @@ a { color: inherit; }
 /* ---- Team: used on the team slide and the thank-you slide ---- */
 const TEAM = [
   { name: "Adrian Boone",  role: "Vice President",    phone: "510.230.7173", email: "adrian.boone@streamrealty.com",  photo: "assets/adrian-boone.jpg" },
-  { name: "Jordan Decker", role: "Managing Director", phone: "317.250.0733", email: "jordan.decker@streamrealty.com", photo: "assets/jordan-decker.jpg" },
-  { name: "Phil Geiger",   role: "Managing Director", phone: "312.576.6713", email: "phil.geiger@streamrealty.com",   photo: "assets/phil-geiger.jpg" },
+  { name: "Ryan Boozer",   role: "Vice Chairman & Partner", phone: "214.300.1199", email: "ryan.boozer@streamrealty.com", photo: "assets/ryan-boozer.jpg" },
 ];
 
 /* ---- Footprint: Mariner's current locations.
