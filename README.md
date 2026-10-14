@@ -1,6 +1,6 @@
 # Mariner Logistics Deck
 
-Interactive pitch deck from Stream Realty Partners (Adrian Boone and Ryan Boozer) for Mariner Logistics. One static page with no build step: open `index.html`, or host the folder on any static host.
+Interactive pitch deck from Stream Realty Partners' National Tenant Representation team (Adrian Boone and Ryan Boozer) for Mariner Logistics. One static page with no build step: open `index.html`, or host the folder on any static host.
 
 ## Presenting
 
