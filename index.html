@@ -173,21 +173,25 @@ a { color: inherit; }
 .chip[aria-pressed="false"] { opacity: .5; }
 .chip:hover { border-color: var(--lime); }
 .draft { font-family: var(--tech); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); border: 1.5px dashed var(--lime); padding: 7px 12px; }
-.fp-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; display: grid; grid-template-rows: 112px 190px auto 1fr; border-left: 1px solid var(--lime-line); background: rgba(0,10,40,.55); }
-.fp-photo { grid-row: 2; background: linear-gradient(180deg, rgba(13,26,46,0) 60%, var(--navy)), url("assets/photos/truck-wireframe.jpg") 50% 55% / cover; border-top: 1px solid var(--lime-line); border-bottom: 1px solid var(--lime-line); }  /* below the logo strip, so the Stream logo sits on navy */
-.fp-stats { grid-row: 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 26px 24px 20px; border-bottom: 1px solid var(--lime-line); }  /* three equal, centered columns */
+.fp-panel { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; display: grid; grid-template-rows: 112px auto 1fr; border-left: 1px solid var(--lime-line); background: rgba(0,10,40,.55); }
+.fp-stats { grid-row: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 18px 24px 16px; border-top: 1px solid var(--lime-line); border-bottom: 1px solid var(--lime-line); }  /* three equal, centered columns */
 .fp-stats > div { border-left: 1px solid var(--rule); text-align: center; }
 .fp-stats > div:first-child { border-left: 0; }
-.fp-panel > :last-child { grid-row: 4; }
+.fp-panel > :last-child { grid-row: 3; min-height: 0; }
 .fp-stats .stat-val { font-size: 44px; }
 .fp-stats .stat-lbl { font-size: 14px; }
-.site-list { list-style: none; padding: 14px 40px 28px; display: grid; align-content: start; gap: 8px; overflow: auto; }
+.site-list { list-style: none; padding: 12px 32px 20px; display: grid; align-content: start; gap: 12px; overflow: auto; }
 .site { border: 1px solid var(--rule); background: rgba(13,26,46,.7); padding: 12px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 3px 14px; align-items: baseline; cursor: pointer; text-align: left; width: 100%; transition: border-color .2s, background .2s; color: inherit; }
 .site:hover, .site.on { border-color: var(--lime); background: rgba(211,255,40,.08); }
 .site i { width: 10px; height: 10px; background: var(--lime); align-self: center; grid-row: 1; }
 .site b { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--white); }
 .site em { font-style: normal; font-family: var(--tech); font-size: 15px; letter-spacing: .04em; color: var(--lime); white-space: nowrap; }
-.site small { grid-column: 2 / -1; font-size: 15px; color: var(--text); }
+.site small { grid-column: 2 / -1; font-size: 14px; color: var(--text); }
+.site .facts { grid-column: 2 / -1; margin: 6px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1px 16px; border-top: 1px solid var(--rule); padding-top: 5px; }
+.site .facts div { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14.5px; line-height: 1.6; }
+.site .facts dt { font-family: var(--tech); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--grey); white-space: nowrap; }
+.site .facts dd { margin: 0; color: var(--white); text-align: right; white-space: nowrap; }
+.site .facts .wide { grid-column: 1 / -1; }
 .site .specs { grid-column: 2 / -1; font-family: var(--tech); font-size: 13px; letter-spacing: .06em; color: var(--grey); }
 .site .specs .sep { margin: 0 8px; color: var(--lime); }
 .site .note { grid-column: 2 / -1; font-family: var(--tech); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--lime); }
@@ -316,7 +320,7 @@ a { color: inherit; }
 
   .fp-headrow { flex-direction: column; align-items: start; }
   .chips { justify-content: start; }
-  .fp-panel { grid-template-rows: 0 160px auto auto; padding: 0; }
+  .fp-panel { grid-template-rows: 0 auto auto; padding: 0; }
   .fp-stats { padding: 20px 16px; }
   .site-list { padding: 16px; }
 
@@ -456,7 +460,6 @@ a { color: inherit; }
         </div>
       </div>
       <aside class="fp-panel">
-        <div class="fp-photo" aria-hidden="true"></div>
         <div class="fp-stats rise" style="--d:2">
           <div><div class="stat-val num" id="fpSites">—</div><div class="stat-lbl">Sites</div></div>
           <div><div class="stat-val num" id="fpSf">—</div><div class="stat-lbl">Total SF</div></div>
@@ -629,6 +632,9 @@ function officeLayer(svg, map, withLabels) {
   const wrap = svg.parentElement, pop = document.getElementById("sitePop"), list = document.getElementById("siteList");
   const fmtSf = (n, exact) => (exact ? "" : "~") + Number(n).toLocaleString("en-US") + " SF";
   const specs = s => [s.built && `Built ${s.built}`, s.clear && `${s.clear}′ clear`].filter(Boolean);
+  const facts = s => [["Built", s.built], ["Clear height", s.clear && `${s.clear} ft`],
+    ["Commenced", s.lease?.commenced], ["Expires", s.lease?.expires], ["Term", s.lease?.term], ["Rate", s.lease?.rate], ["Escalations", s.lease?.escalations]]
+    .filter(([, v]) => v);
   // counties, with the ones holding a site lifted slightly
   const siteCounties = new Set(["Dallas", "Tarrant"]);
   D.counties.forEach(c => svgEl("path", { d: c.d, class: "cty" + (siteCounties.has(c.name) ? " has" : "") }, svg));
@@ -671,8 +677,7 @@ function officeLayer(svg, map, withLabels) {
     const row = document.createElement("button");
     row.type = "button"; row.className = "site";
     row.innerHTML = `<i></i><b>${esc(s.city)}, ${esc(s.state)}</b><em>${fmtSf(s.sf, s.exact)}</em><small>${esc(s.address)}</small>`
-      + (specs(s).length ? `<span class="specs">${specs(s).map(esc).join('<span class="sep">·</span>')}</span>` : "")
-      + (s.lease ? `<span class="specs">Lease exp. ${esc(s.lease.expires)}<span class="sep">·</span>${esc(s.lease.rate)}</span>` : "")
+      + `<dl class="facts">${facts(s).map(([k, v], n, all) => `<div${n === all.length - 1 && n % 2 === 0 ? ' class="wide"' : ""}><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`
       + (s.note ? `<span class="note">${esc(s.note)}</span>` : "");
     li.appendChild(row); list.appendChild(li);
     [pin, lbl, sf, row].forEach(n => n.addEventListener("click", e => { e.stopPropagation(); open(i); }));
