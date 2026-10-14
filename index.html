@@ -207,11 +207,12 @@ a { color: inherit; }
 .dfwmap .pin:hover, .dfwmap .pin.on, .dfwmap .pin:focus { fill: var(--white); outline: none; }
 .dfwmap .plbl { font-family: var(--tech); font-size: 19px; font-weight: 600; fill: var(--white); cursor: pointer; }
 .dfwmap .psf { font-family: var(--tech); font-size: 14px; fill: var(--lime); cursor: pointer; }
-.site-pop { position: absolute; z-index: 4; width: 300px; background: var(--navy); border: 1px solid var(--lime); box-shadow: 0 18px 40px rgba(0,0,0,.55); opacity: 0; transform: scale(.85); pointer-events: none; transition: opacity .25s ease, transform .3s cubic-bezier(.2,.8,.2,1); }
+.site-pop { position: absolute; z-index: 4; width: 360px; background: var(--navy); border: 1px solid var(--lime); box-shadow: 0 18px 40px rgba(0,0,0,.55); opacity: 0; transform: scale(.85); pointer-events: none; transition: opacity .25s ease, transform .3s cubic-bezier(.2,.8,.2,1); }
 .site-pop.open { opacity: 1; transform: none; pointer-events: auto; }
 .site-pop .shot { aspect-ratio: 16 / 10; background: repeating-linear-gradient(45deg, rgba(211,255,40,.05) 0 10px, transparent 10px 20px), var(--navy-2); border-bottom: 1px solid var(--lime-line); display: grid; place-items: center; align-content: center; gap: 8px; color: var(--grey); font-family: var(--tech); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; overflow: hidden; }
 .site-pop .shot svg { width: 34px; height: 34px; fill: none; stroke: var(--grey); stroke-width: 1.6; }
-.site-pop .shot img { width: 100%; height: 100%; object-fit: cover; }
+.site-pop .shot.photo { display: block; background: var(--navy-2); }
+.site-pop .shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .site-pop .body { padding: 14px 16px 16px; display: grid; gap: 4px; }
 .site-pop h4 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 22px; color: var(--white); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .site-pop h4 span { font-family: var(--tech); font-size: 15px; font-weight: 500; color: var(--lime); }
@@ -513,9 +514,9 @@ const TEAM = [
    lat/lon place the pin; sf feeds the totals; built (year) and clear (feet) show as specs; note adds a line under the address.
    photo: set to an image path (e.g. "assets/sites/coppell.jpg") to replace the placeholder in the pop-out. ---- */
 const FOOTPRINT = [
-  { city: "Coppell",    state: "TX", sf: 150000, address: "330 S Royal Ln, Coppell, TX 75019",          built: 2014, clear: 28, lat: 32.9445, lon: -97.0223, photo: null },
-  { city: "DeSoto",     state: "TX", sf: 300000, address: "1221 E Centre Park Blvd, DeSoto, TX 75115",  built: 2008, clear: 32, lat: 32.6253, lon: -96.8279, photo: null, note: "Golf Relay (sister company)" },
-  { city: "Fort Worth", state: "TX", sf: 250000, address: "2555 Downing Dr, Fort Worth, TX 76106",      built: 2022, clear: 36, lat: 32.8197, lon: -97.3252, photo: null },
+  { city: "Coppell",    state: "TX", sf: 150000, address: "330 S Royal Ln, Coppell, TX 75019",          built: 2014, clear: 28, lat: 32.9445, lon: -97.0223, photo: "assets/sites/coppell.jpg" },
+  { city: "DeSoto",     state: "TX", sf: 300000, address: "1221 E Centre Park Blvd, DeSoto, TX 75115",  built: 2008, clear: 32, lat: 32.6253, lon: -96.8279, photo: "assets/sites/desoto.jpg", note: "Golf Relay (sister company)" },
+  { city: "Fort Worth", state: "TX", sf: 250000, address: "2555 Downing Dr, Fort Worth, TX 76106",      built: 2022, clear: 36, lat: 32.8197, lon: -97.3252, photo: "assets/sites/fort-worth.jpg" },
 ];
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -680,7 +681,7 @@ function officeLayer(svg, map, withLabels) {
     const shot = s.photo
       ? `<img src="${esc(s.photo)}" alt="${esc(s.city)} site">`
       : `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="6" width="26" height="20"/><path d="M3 22l8-8 6 6 4-4 8 8"/><circle cx="22" cy="12" r="2.5"/></svg>Site photo to come`;
-    pop.innerHTML = `<div class="shot">${shot}</div><div class="body"><h4>${esc(s.city)}, ${esc(s.state)}<span>${fmtSf(s.sf)}</span></h4><p>${esc(s.address)}</p>${specs(s).length ? `<dl class="pspecs">${s.built ? `<div><dt>Year built</dt><dd>${esc(s.built)}</dd></div>` : ""}${s.clear ? `<div><dt>Clear height</dt><dd>${esc(s.clear)} ft</dd></div>` : ""}</dl>` : ""}${s.note ? `<span class="note">${esc(s.note)}</span>` : ""}</div><button class="x" type="button" aria-label="Close">×</button>`;
+    pop.innerHTML = `<div class="shot${s.photo ? " photo" : ""}">${shot}</div><div class="body"><h4>${esc(s.city)}, ${esc(s.state)}<span>${fmtSf(s.sf)}</span></h4><p>${esc(s.address)}</p>${specs(s).length ? `<dl class="pspecs">${s.built ? `<div><dt>Year built</dt><dd>${esc(s.built)}</dd></div>` : ""}${s.clear ? `<div><dt>Clear height</dt><dd>${esc(s.clear)} ft</dd></div>` : ""}</dl>` : ""}${s.note ? `<span class="note">${esc(s.note)}</span>` : ""}</div><button class="x" type="button" aria-label="Close">×</button>`;
     pop.querySelector(".x").addEventListener("click", e => { e.stopPropagation(); close(); });
     // place beside the pin, in the wrapper's own (unscaled) pixels
     const sr = svg.getBoundingClientRect(), wr = wrap.getBoundingClientRect(), k = sr.width / svg.clientWidth || 1;
