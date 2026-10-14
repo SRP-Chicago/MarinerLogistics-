@@ -518,7 +518,8 @@ const TEAM = [
    lease (commenced, expires, term, rate, escalations; any can be left out) adds lease terms to the pop-out; note adds a line under the address.
    photo: set to an image path (e.g. "assets/sites/coppell.jpg") to replace the placeholder in the pop-out. ---- */
 const FOOTPRINT = [
-  { city: "Coppell",    state: "TX", sf: 150000, address: "330 S Royal Ln, Coppell, TX 75019",          built: 2014, clear: 28, lat: 32.9445, lon: -97.0223, photo: "assets/sites/coppell.jpg" },
+  { city: "Coppell",    state: "TX", sf: 154000, exact: true, address: "330 S Royal Ln, Coppell, TX 75019",          built: 2014, clear: 28,
+    lease: { expires: "Q2 2027", rate: "~$8/SF gross" }, lat: 32.9445, lon: -97.0223, photo: "assets/sites/coppell.jpg" },
   { city: "DeSoto",     state: "TX", sf: 350150, exact: true, address: "1221 E Centre Park Blvd, DeSoto, TX 75115",  built: 2008, clear: 32,
     lease: { expires: "3/31/2029", term: "91 months (7 free)", rate: "$3.40/SF NNN", escalations: "2.5% annually" }, lat: 32.6253, lon: -96.8279, photo: "assets/sites/desoto.jpg", note: "Golf Relay (sister company)" },
   { city: "Fort Worth", state: "TX", sf: 291515, exact: true, address: "2555 Downing Dr, Fort Worth, TX 76106",      built: 2022, clear: 36,
